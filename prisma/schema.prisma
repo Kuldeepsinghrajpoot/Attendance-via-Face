@@ -8,11 +8,12 @@ datasource db {
 }
 
 model student {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  email    String
-  fullName String
-  password String
-  uid      Int
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  email      String
+  fullName   String
+  password   String
+  RollNumber String
+  
 }
 
 model question {
@@ -23,5 +24,5 @@ model question {
   option2   String
   option3   String
   option4   String
-  createdAt DateTime @default(now())
+  // createdAt DateTime @default(now())
 }

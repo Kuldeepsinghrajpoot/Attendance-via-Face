@@ -51,7 +51,7 @@ export  function SideBar() {
         <Sheet >
             <SheetTrigger asChild>
                 {/* <Button >☰</Button> */}
-                <button className=""><RiMenu2Fill /></button>
+                <button className="flex justify-center items-center text-center  h-full w-full"><RiMenu2Fill /></button>
             </SheetTrigger>
             <SheetContent side={'left'} className="px-0 py-0" >
                 <SheetHeader>

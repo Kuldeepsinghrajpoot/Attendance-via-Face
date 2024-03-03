@@ -1,9 +1,5 @@
-
-
 'use client'
-// components/ImageCapture.tsx
-
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 const ImageCapture: React.FC<{ onCapture: (imageData: string) => void }> = ({ onCapture }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -43,29 +39,30 @@ const ImageCapture: React.FC<{ onCapture: (imageData: string) => void }> = ({ on
             setStream(null); // Reset stream state
         }
     };
+
     return (
-        <div className='flex justify-start '>
+        <div className='flex justify-start'>
             <div className='w-full h-full'>
                 <label htmlFor="name">Capture Image</label>
-                <div className='h-24 w-24   rounded-lg ' >
-                    {capturedImageData === "" ? (
-
-                        capturedImageData == "" ? (<video className='h-24 w-24 ' ref={videoRef} autoPlay />) : <img className='h-24 w-24  border rounded-lg' src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="" />
-
+                <div className='h-24 w-24 rounded-lg'>
+                    {capturedImageData ? (
+                        <img className='h-[5.8rem] w-24 rounded-md overflow-hidden items-center object-cover' src={capturedImageData} alt="Captured Image" />
                     ) : (
-                        capturedImageData !== "" ? (<img className='h-[5.8rem] w-24 rounded-md overflow-hidden items-center  object-cover ' src={capturedImageData} alt="Captured Image" />) : <img className='h-24 w-24  border rounded-lg' src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="" />
+                        <video className='h-24 w-24' ref={videoRef} autoPlay />
                     )}
-                    {capturedImageData === "" ? (
-                        <canvas className='  ' ref={canvasRef} style={{ display: 'none' }} />
-                    ) : null}
-                    {/* <img className='h-24 w-24  border rounded-lg' src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="" /> */}
+                    {capturedImageData === "" && (
+                        <canvas ref={canvasRef} style={{ display: 'none' }} />
+                    )}
                 </div>
             </div>
-            <div className='w-full h-full  py-10 gap-5 '>
-
-                <div className='flex justify-start gap-10 text-white '>
-                    <div><button  type='button'  onClick={startCapture} className='bg-red-700 w-[6rem] px-3 rounded-md py-2 gap-5'>Start</button></div>
-                    <div><button  type='button' onClick={captureImage} className='bg-red-700 w-[6rem] px-3 rounded-md py-2 gap-5'>Capture</button></div>
+            <div className='w-full h-full py-10 gap-5'>
+                <div className='flex justify-start gap-10 text-white'>
+                    <div>
+                        <button type='button' onClick={startCapture} className='bg-red-700 w-[6rem] px-3 rounded-md py-2 gap-5'>Start</button>
+                    </div>
+                    <div>
+                        <button type='button' onClick={captureImage} className='bg-red-700 w-[6rem] px-3 rounded-md py-2 gap-5'>Capture</button>
+                    </div>
                 </div>
             </div>
         </div>

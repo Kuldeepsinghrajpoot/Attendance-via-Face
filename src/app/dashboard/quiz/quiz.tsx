@@ -14,6 +14,8 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button";
 import { GrNext } from "react-icons/gr";
 import { GrPrevious } from "react-icons/gr";
+import ImageCapture from "./caputreImage";
+import VerifiedUser from './verified'
 
 interface question {
     question: any
@@ -42,48 +44,43 @@ const Quiz: React.FC<Props> = ({ question }) => {
     const handleSubmit = () => {
         // Logic to handle form submission
     };
+    // this method for the caputer image 
+    const [name, setname] = useState('');
+    const handleCapture = async (dataURL: string) => {
+        console.log(dataURL, 'image url and store');
+
+        const response = await fetch('http://127.0.0.1:8000/verify-face', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ image: dataURL }),
+        });
+        const data = await response.json();
+        console.log(data.message);
+        setname(data.message)
+        // alert(`<img src=${dataURL} />`)
+
+    };
+    const data: boolean = true
     return (
 
         <div className=' '>
 
             <div className='flex justify-between px-7 py-5 gap-10 h-full w-full  text-foreground '>
                 <div className='w-56'>
-                    <Card className=' bg-background  shadow-gray-200 border-none rounded-sm  drop-shadow-md text-[#9C9AA6]  '>
-                        <CardHeader>
-                            <CardTitle className='text-xl font-extralight'>Card Title</CardTitle>
-                            <CardDescription>Card Description</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p>Card Content</p>
-                        </CardContent>
-                        <CardFooter>
-                            <p>Card Footer</p>
-                        </CardFooter>
-                    </Card>
+                
+                   {/* image capture image */}
+                   <ImageCapture  onCapture={handleCapture}/>
+              
                 </div>
                 <div className=' w-full  h-full gap-5  px-5 py-5 flex flex-col justify-between '>
 
                     <>
-
-                        <div className=' border-border bg-background flex px-5 py-4 mix-blend-color	shadow-inner	  justify-between bg-white  border-none   rounded-sm drop-shadow-md  text-[#9C9AA6]'>
-                            <div>
-                                <div>Subject - Digital Image Processing</div>
-                                <div>Time : 20min</div>
-                                <div>Date : {new Date().getFullYear()} - {new Date().getMonth() + 1} - {new Date().getDate()}</div>
-                                <div>Number of Question :10</div>
-                            </div>
-                            <div>
-                                <div>
-                                    Name : Kuldeep Singh Rajpoot
-                                </div>
-                                <div>Roll Number : 0901CS213D06</div>
-                                <div>Image : </div>
-                            </div>
-
-                        </div>
+                  {name&& <VerifiedUser id={name}/>}
                         <div className=' px-20 py-5'>
 
-                            <Card className=' shadow-inner border-none px-5 py-5 w-full h-full  rounded-sm drop-shadow-md  text-[#9C9AA6]  '>
+                            {name&&<Card className='  border-none px-5 py-5 w-full h-full  rounded-sm drop-shadow-md  text-[#9C9AA6] dark:text-white '>
 
                                 {question.slice(startIndex, endIndex).map((item: any, key: number) => {
                                     const { Question, option1, option2, option3, option4 } = item
@@ -93,7 +90,7 @@ const Quiz: React.FC<Props> = ({ question }) => {
                                         <div key={item.id}>
 
                                             <CardHeader>
-                                                <CardTitle className='text-xl font-extralight  text-zinc-900'>{currentPage + 1} {Question}</CardTitle>
+                                                <CardTitle className='text-xl font-extralight  text-zinc-900 dark:text-white'>{currentPage + 1} {Question}</CardTitle>
                                                 {/* <CardDescription>Question : 01</CardDescription> */}
                                             </CardHeader>
 
@@ -166,6 +163,7 @@ const Quiz: React.FC<Props> = ({ question }) => {
                                     </div>
                                 </div>
                             </Card>
+                            }
                         </div>
                     </>
 

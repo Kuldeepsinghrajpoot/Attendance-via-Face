@@ -23,6 +23,7 @@ export async function GET() {
     return NextResponse.json({ question })
   } catch (error) {
     console.error('Error retrieving data:', error);
+    return NextResponse.json({status:500})
   } finally {
     await prisma.$disconnect();
   }
@@ -30,7 +31,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { Question, option1, option2, option3, option4 }: { Question: string, option1: string, option2: string, option3: string, option4: string } = await request.json();
+    const { Question, option1, option2, option3, option4 }:Question = await request.json();
 
     // console.log(fullName);
 

@@ -37,7 +37,7 @@ const Navbar = () => {
     return (
         <div className=' text-[#9C9AA6]  font-[public sans,  -apple-system,  blinkmacsystemfont,  segoe ui,  oxygen,  ubuntu,  cantarell,  fira sans,  droid sans,  helvetica neue,  sans-serif, tabler-icons, font awesome 6 free, open sans] sticky top-0 z-50 flex justify-between  overflow-hidden shadow-md'>
             <div className=' flex justify-between w-full '>
-                <div className='  hidden xl:block w-80 h-screen bg-white shadow-xl dark:text-white dark:bg-black'>
+                <div className='  hidden xl:block w-80 h-screen text-foreground bg-background'>
                     <div>
                         <div className=' mix-blend-normal px-4 gap-5 my-5 w-full h-full flex justify-center items-center text-center'>
                             <div className='w-10 h-10 flex justify-center items-center text-center'>
