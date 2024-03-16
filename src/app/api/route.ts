@@ -1,4 +1,4 @@
-import schema from "@/models/schema";
+
 // import connectDB from "@/utils/db/database";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic'
 const prisma = new PrismaClient();
 
 
-export async function GET(request: { nextUrl: URL }) {
+export async function GET( request:NextRequest) {
   const id=request.nextUrl.searchParams.get("id")
   // if(id){
   //   return NextResponse.json({message:"something went wrong"})
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     console.log(email,fullName,password,RollNumber)
     const Register = await prisma.student.create({
       data: {
-        email,fullName,password,RollNumber 
+        email,fullName,password,rollNumber:RollNumber 
       },
     });
 

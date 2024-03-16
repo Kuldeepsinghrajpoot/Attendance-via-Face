@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 interface UserData {
   user: {
     fullName: string;
-    RollNumber: string;
+    rollNumber: string;
     email: string;
   }
 }
@@ -40,7 +40,7 @@ const VerifiedUser: React.FC<{ id: any }> = ({ id }) => {
   return (
     <>
       {name && (
-        <div className='border-border bg-background flex px-5 py-4 mix-blend-color shadow-inner justify-between bg-white dark:bg-background border-none rounded-sm drop-shadow-md dark:text-white text-[#9C9AA6]'>
+        <div className=' flex justify-between bg-white px-5 py-5 drop-shadow-md dark:bg-background'>
           <div>
             <div>Subject - Digital Image Processing</div>
             <div>Time : 20min</div>
@@ -49,7 +49,7 @@ const VerifiedUser: React.FC<{ id: any }> = ({ id }) => {
           </div>
           <div>
             <div>Name : {name.user.fullName}</div>
-            <div>Roll Number : {name.user.RollNumber}</div>
+            <div>Roll Number : {name.user.rollNumber}</div>
             <div>Email : {name.user.email}</div>
           </div>
         </div>

@@ -14,8 +14,10 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button";
 import { GrNext } from "react-icons/gr";
 import { GrPrevious } from "react-icons/gr";
-import ImageCapture from "./caputreImage";
-import VerifiedUser from './verified'
+import ImageCapture from "../caputreImage";
+import VerifiedUser from '../verified'
+
+// import moduleName from '../caputreImage'
 
 interface question {
     question: any
@@ -25,7 +27,7 @@ interface Props {
 }
 const Quiz: React.FC<Props> = ({ question }) => {
     const [currentPage, setCurrentPage] = useState(0);
-
+    const [inputAnswers, setInputAnswers] = useState<{ [key: number]: string }>({});
 
     const questionsPerPage = 1; // Change this to adjust the number of questions per page
 
@@ -63,13 +65,16 @@ const Quiz: React.FC<Props> = ({ question }) => {
 
     };
     const data: boolean = true
+    const handleInputChange = (questionId: number, value: string) => {
+      setInputAnswers(prevState => ({
+          ...prevState,
+          [questionId]: value
+      }));
+  };
     return (
-
         <div className=' '>
-
             <div className='flex justify-between px-7 py-5 gap-10 h-full w-full  text-foreground '>
                 <div className='w-56'>
-                
                    {/* image capture image */}
                    <ImageCapture  onCapture={handleCapture}/>
               
@@ -80,15 +85,14 @@ const Quiz: React.FC<Props> = ({ question }) => {
                   {name&& <VerifiedUser id={name}/>}
                         <div className=' px-20 py-5'>
 
-                            {name&&<Card className='  border-none px-5 py-5 w-full h-full  rounded-sm drop-shadow-md  text-[#9C9AA6] dark:text-white '>
+                            {<Card className='  border-none px-5 py-5 w-full h-full  rounded-sm drop-shadow-md  text-[#9C9AA6] dark:text-white '>
 
                                 {question.slice(startIndex, endIndex).map((item: any, key: number) => {
                                     const { Question, option1, option2, option3, option4 } = item
                                     // console.log(question)
+                                    // const inputAnswer = inputAnswers[id] || '';
                                     return (
-
                                         <div key={item.id}>
-
                                             <CardHeader>
                                                 <CardTitle className='text-xl font-extralight  text-zinc-900 dark:text-white'>{currentPage + 1} {Question}</CardTitle>
                                                 {/* <CardDescription>Question : 01</CardDescription> */}

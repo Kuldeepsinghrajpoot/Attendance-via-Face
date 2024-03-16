@@ -1,13 +1,16 @@
-import schema from "@/models/schema";
+
 // import connectDB from "@/utils/db/database";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Question {
-  Question: any;
-  option1: any;
-  option2: any;
-  option3: any; 
-  option4: any
+  Question: any|undefined;
+  option1: any|undefined;
+  option2: any|undefined;
+  option3: any|undefined;
+  option4: any|undefined;
+  subjectName: any|undefined ;
+  vicesubjectName: any|undefined ;
+
 }
 
 
@@ -16,35 +19,105 @@ export const dynamic = 'force-dynamic'
 const prisma = new PrismaClient();
 
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    const question = await prisma.question.findMany();
-    // console.log(allUsers);
-    return NextResponse.json({ question })
+    const { Question, option1, option2, option3, option4, subjectName, vicesubjectName }: Question = await request.json();
+
+    // Find or create the Subject
+    let subject = await prisma.subject.findFirst({
+      where: {
+        subjectName: subjectName,
+      },
+    });
+
+    if (!subject) {
+      // If the subject doesn't exist, create it
+      subject = await prisma.subject.create({
+        data: {
+          subjectName: subjectName,
+        },
+      });
+    }
+
+    // Find or create the Vicesubject associated with the Subject
+    let vicesubject = await prisma.vicesubject.findFirst({
+      where: {
+        subjectId: subject.id,
+        subjectName: vicesubjectName,
+      },
+    });
+
+    if (!vicesubject) {
+      // If the vicesubject doesn't exist, create it
+      vicesubject = await prisma.vicesubject.create({
+        data: {
+          subjectName: vicesubjectName,
+          subject: { connect: { id: subject.id } }, // Connect to the Subject
+        },
+      });
+    }
+
+    // Create the question associated with the vicesubject
+    const newQuestion = await prisma.question.create({
+      data: {
+        Question,
+        option1,
+        option2,
+        option3,
+        option4,
+        viceSubjectId: vicesubject.id, // Use viceSubjectId instead of viceSubject
+      },
+      include: {
+        viceSubject: true,
+      },
+    });
+
+    return NextResponse.json(newQuestion, { status: 200 });
   } catch (error) {
-    console.error('Error retrieving data:', error);
-    return NextResponse.json({status:500})
+    console.error('Error creating question:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function POST(request: NextRequest) {
+
+
+
+
+export async function GET(request: NextRequest) {
+  // console.log(request.nextUrl.searchParams.get('quiz'))
+  // console.log(request.nextUrl.searchParams.get('id'))
+
+  //   return NextResponse.json({status:200})
   try {
-    const { Question, option1, option2, option3, option4 }:Question = await request.json();
+    const subjectName: any|undefined = request.nextUrl.searchParams.get('id');
+    const vicesubjectName: any|undefined = request.nextUrl.searchParams.get('quiz');
 
-    // console.log(fullName);
+    // Find the Subject
+    const subject = await prisma.subject.findMany(
+      // where: {
+      //   subjectName,
+      // },
+      // include: {
+      //   viceSubjects: {
+      //     where: {
+      //       subjectName: vicesubjectName,
+      //     },
+      //     include: {
+      //       questions: true,
+      //     },
+      //   },
+      // },
+    );
 
-    const newAttendance = await prisma.question.create({
+    if (!subject) {
+      return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
+    }
 
-      data: {Question, option1, option2, option3, option4 },
-      // Add other properties as needed
-
-    });
-
-    return NextResponse.json(newAttendance, { status: 200 });
+    return NextResponse.json({ subject });
   } catch (error) {
-    console.error('Error creating attendance:', error);
+    console.error('Error retrieving subject and questions:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   } finally {
     await prisma.$disconnect();

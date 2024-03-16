@@ -7,22 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model student {
+model Student {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
-  email      String
+  email      String 
   fullName   String
   password   String
-  RollNumber String
-  
+  rollNumber String 
 }
 
-model question {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  // uiid     Int    autoincrement()
-  Question  String
-  option1   String
-  option2   String
-  option3   String
-  option4   String
-  // createdAt DateTime @default(now())
+// model teacher {
+//   id          String    @id @default(auto()) @map("_id") @db.ObjectId
+//   email       String    @unique
+//   fullName    String
+//   phoneNumber Int
+//   SubjectName Subject[]
+//   // SubjectsName String
+// }
+
+model Subject {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName  String      
+  viceSubjects Vicesubject[]
+  // teacher      teacher       @relation(fields: [teacherId], references: [id])
+  // teacherId    String
+}
+
+model Vicesubject {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName String    
+  subject     Subject    @relation(fields: [subjectId], references: [id])
+  subjectId   String
+  questions   Question[]
+}
+
+model Question {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  Question      String
+  option1       String
+  option2       String
+  option3       String
+  option4       String
+  createdAt     DateTime    @default(now())
+  viceSubject   Vicesubject @relation(fields: [viceSubjectId], references: [id])
+  viceSubjectId String
 }

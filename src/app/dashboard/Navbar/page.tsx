@@ -16,6 +16,9 @@ interface linkBar {
 
 const Navbar = () => {
     const router = usePathname();
+    const dynamicPart = router;
+    console.log(dynamicPart)
+    // const router = usePathname();
     const linkBar: linkBar[] = [
         {
             'title': "Dashboard",
@@ -24,14 +27,26 @@ const Navbar = () => {
             'icon': <RxDashboard className='w-5 h-5' />
         }, {
             'title': "Quiz",
-            'url': '../dashboard/quiz',
+            'url': '/dashboard/quiz/',
             path: '/dashboard/quiz',
             'icon': <IoMdAddCircleOutline className='w-5 h-5' />
         }, {
             'title': "Quiz Status",
-            'url': '../dashboard/QuizStatus',
+            'url': '',
             path: '/dashboard/QuizStatus',
             'icon': <GrStatusGood className='w-5 h-5' />
+        },
+        {
+            'title':'Add Question',
+            'url':'/dashboard/Question',
+            path:'/dashboard/Question',
+            icon:<IoMdAddCircleOutline className='w-5 h-5' />
+        },
+        {
+            'title':'Attendance',
+            'url':'/dashboard/attendance',
+            path:'/dashboard/attendance',
+            icon:<IoMdAddCircleOutline className='w-5 h-5' />
         }
     ]
     return (

@@ -1,6 +1,7 @@
 'use client'
 
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
 import { useRef, useState } from 'react';
@@ -45,23 +46,14 @@ const ImageCapture: React.FC<{ onCapture: (imageData: string) => void }> = ({ on
     }
   };
 
-  const randomImage = "https://via.placeholder.com/150"; // URL of a random image
 
   return (
     <div  >
       <>
-
-
-
-
-        <Card className=' bg-background  shadow-gray-200 dark:shadow-black border-none rounded-sm  drop-shadow-md   '>
+        <Card className=' bg-background   border-none rounded-sm  drop-shadow-md   '>
          <div className='py-2'></div>
           <CardContent>
             <div className=''>
-              {/* <div className='h-28 w-28'>
-
-                        {capturedImageData === "" && !stream && <img className='h-28 w-28' src={randomImage} alt="Random Image" />}
-                    </div> */}
               {capturedImageData === "" ? (
 
                 <video width="740" height="580" ref={videoRef} autoPlay />
@@ -77,8 +69,8 @@ const ImageCapture: React.FC<{ onCapture: (imageData: string) => void }> = ({ on
          {capturedImageData === ""&& <CardContent>
             <div className='flex justify-between gap-5 text-sm '>
 
-            <button className='bg-primary text-secondary-foreground  h-[2rem] w-[10rem] rounded-md ' onClick={startCapture}>Start </button>
-            <button className='bg-primary text-secondary-foreground  h-[2rem] w-[10rem] rounded-md  ' onClick={captureImage}>Capture </button>
+            <Button className=' rounded-md  -py-10'  onClick={startCapture}>Start </Button>
+            <Button className=' rounded-md  -py-10'   onClick={captureImage}>Capture </Button>
             </div>
 
           </CardContent>}
