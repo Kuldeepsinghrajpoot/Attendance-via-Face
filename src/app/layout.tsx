@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, M_PLUS_1 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 // import Navbar from "./Navbar/page";
@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 // import NavBarItem from "@/dashboad/Navbar.tsx/navBarItem";
 import NextTopLoader from 'nextjs-toploader';
 import { ThemeProvider } from "@/components/theme-provider";
+import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "./Provider";
+import { Toaster } from "@/components/ui/toaster"
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,32 +21,31 @@ export const metadata: Metadata = {
 };
 
 // context api
-export default function RootLayout({
+export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en"  suppressHydrationWarning>
-     
-      <body  suppressHydrationWarning  className={cn("    h-screen  antialiased bg-[#F8F7FA]  dark:bg-zinc-900 text-black dark:text-white  w-full ",
-        inter.className)}>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning className={cn("   h-full   antialiased bg-[#F8F7FA]  dark:bg-zinc-900 text-black dark:text-white  w-full ",
+        )}>
         {/* <Navbar/> */}
         <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-        <NextTopLoader />
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+        <AuthProvider>
+          <NextTopLoader />
 
-        {children}
-        {/* <div className=" sticky top-0 z-50  flex justify-between">
-        <div className="xl:w-60 "> <Navbar/>  </div>
-        <div className="w-screen sticky top-0 z-50"> <NavBarItem/>  </div>
-      </div> */}
-
-</ThemeProvider>
+       
+          {children}
+        
+        </AuthProvider>
+        <Toaster />
+        </ThemeProvider>
       </body>
      
     </html>

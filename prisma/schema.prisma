@@ -8,21 +8,23 @@ datasource db {
 }
 
 model Student {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  email      String 
-  fullName   String
-  password   String
-  rollNumber String 
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  email        String
+  fullName     String
+  password     String
+  rollNumber   String
+  attendances  Attendance[]
 }
 
-// model teacher {
-//   id          String    @id @default(auto()) @map("_id") @db.ObjectId
-//   email       String    @unique
-//   fullName    String
-//   phoneNumber Int
-//   SubjectName Subject[]
-//   // SubjectsName String
-// }
+//  this method of linking the method of attendace of students
+model Attendance {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime  @default(now())
+  student    Student   @relation(fields: [studentId], references: [id])
+  studentId  String
+  attendancevalue String
+}
+
 
 model Subject {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -51,3 +53,4 @@ model Question {
   viceSubject   Vicesubject @relation(fields: [viceSubjectId], references: [id])
   viceSubjectId String
 }
+

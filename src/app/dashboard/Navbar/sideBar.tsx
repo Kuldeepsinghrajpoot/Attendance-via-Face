@@ -20,6 +20,7 @@ import { RxDashboard } from "react-icons/rx";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { GrStatusGood } from "react-icons/gr";
 import { usePathname } from 'next/navigation';
+import { useSession } from "next-auth/react";
 // import Dashboard from '@/app/dashboard/page';
 interface linkBar {
     title: string,
@@ -28,6 +29,8 @@ interface linkBar {
     path:string,
 }
 export  function SideBar() {
+
+   const{data:session}:any= useSession()
     const router = usePathname();
     const linkBar: linkBar[] = [
         {
@@ -45,6 +48,11 @@ export  function SideBar() {
             'url': '../QuizStatus',
             path:'/QuizStatus',
             'icon': <GrStatusGood className='w-5 h-5' />
+        },{
+            'title':'Attendace',
+            'url':'/AttendanceRecordTeacher',
+            path:'AttendanceRecordTeacher',
+            icon:<GrStatusGood className='w-5 h-5' />
         }
     ]
     return (
@@ -60,7 +68,7 @@ export  function SideBar() {
                             <div className='w-10 h-10 flex justify-center items-center text-center'>
                                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN1NAnlhSMbhwPtdLoWbm4WkAQu5qpPH_Hzw&usqp=CAU" alt="" />
                             </div>
-                            <div className='text-secondary-foreground'>Typing Speed</div>
+                            <div className='text-secondary-foreground'>{session?.user}</div>
                         </div>
                         <div>
                         </div>
