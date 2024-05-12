@@ -13,8 +13,11 @@ interface homepage {
 }
 const auth: authUser[] = [
   {
-    title: 'Login',
+    title: 'Sign In',
     url: './Login'
+  },  {
+    title: 'Sign Up',
+    url: './Register'
   }
 ]
 const homepage: homepage[] = [{
@@ -28,11 +31,11 @@ function Navbar() {
   return (
 
 
-    <div className=' top-0 sticky z-50 px-5'>
+    <div className=' top-0 sticky z-50'>
 
-      <div className='backdrop-blur-md      h-14   w-full sticky z-50 top-0 flex '>
+      <div className='     h-14   w-full sticky z-50 top-0 flex '>
 
-        <div className='sticky top-5 z-50 items-center my-5 w-full rounded-md   bg-background drop-shadow-md flex justify-between  h-16'>
+        <div className='sticky z-50 items-center  w-full    bg-background border flex justify-between  h-16'>
           <ul className='items-center flex justify-start gap-5 px-5 '>
             {homepage.map((item, id) => (
               <li key={id}><Link href={item.url}>{item.title}</Link></li>
@@ -41,7 +44,7 @@ function Navbar() {
           <ul className=' items-center flex justify-end gap-5 px-5'>
 
             {auth.map((item, id) => (
-              <li key={id}><Link href={item.url}>{item.title}</Link></li>
+              <li key={id}><Link href={item.url}>{item.title}  </Link></li>
             ))}
             <li><ModeToggle /></li>
           </ul>

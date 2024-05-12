@@ -11,7 +11,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "./Provider";
 import { Toaster } from "@/components/ui/toaster"
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -45,6 +46,7 @@ export default function DashboardLayout({
         
         </AuthProvider>
         <Toaster />
+        <ToastContainer/>
         </ThemeProvider>
       </body>
      

@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function Login() {
+export default function Register() {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -23,7 +23,7 @@ export default function Login() {
             <h4 className="font-medium leading-none flex justify-center">Login</h4>
             <p className="text-sm text-muted-foreground">
              
-             Welcome to ThetaApp
+             Welcome to TypeSpeed
             </p>
           </div>
           <div className=" ">

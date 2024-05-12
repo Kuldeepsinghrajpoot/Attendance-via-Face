@@ -2,22 +2,17 @@
 // import connectDB from "@/utils/db/database";
 import { NextRequest, NextResponse } from "next/server";
 
-interface userInformation {
-  email: any
-  fullName: any
-  password: any
-  RollNumber: any
-}
+
 
 //  this api for the student information
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Student } from '@prisma/client';
 export const dynamic = 'force-dynamic'
 const prisma = new PrismaClient();
 
 
-export async function GET( request:NextRequest) {
-  const id=request.nextUrl.searchParams.get("id")
+export async function GET(request: NextRequest) {
+  const id = request.nextUrl.searchParams.get("id")
   // if(id){
   //   return NextResponse.json({message:"something went wrong"})
   // }
@@ -35,13 +30,9 @@ export async function GET( request:NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email,fullName,password,RollNumber }: userInformation = await request.json();
-    console.log(email,fullName,password,RollNumber)
-    const Register = await prisma.student.create({
-      data: {
-        email,fullName,password,rollNumber:RollNumber 
-      },
-    });
+    const {id,email,Firstname,lastname,avatar,password,rollNumber}: Student = await request.json();
+    console.log(email, Firstname, password, rollNumber)
+    const Register = await prisma.student.create({data: {id,email,Firstname,lastname,avatar,password,rollNumber}});
 
     return NextResponse.json(Register, { status: 200 });
   } catch (error) {

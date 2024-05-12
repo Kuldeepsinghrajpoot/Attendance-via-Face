@@ -1,72 +1,82 @@
-import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient, Student, Attendance } from "@prisma/client";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
 
 const prisma = new PrismaClient();
-
 interface StudentRequest {
-  student_id: string;
+  avatar: string;
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const { student_id }: StudentRequest = await request.json();
+export async function POST(request: Request): Promise<Response> {
 
-    const user = await prisma.student.findUnique({
+ 
+
+  try {
+    const { avatar }: StudentRequest = await request.json();
+
+    if (!avatar) {
+      return Response.json({ status: 400, error: "user not found" });
+    }
+
+    const user: Student | null = await prisma.student.findUnique({
       where: {
-        id: student_id // Assuming id is a number, if not, adjust accordingly
+        avatar: `${avatar}.jpeg`
       },
     });
 
     if (!user) {
-      return NextResponse.json({ status: 404, error: "User not found" });
+      return Response.json({ status: 404, error: "User not found" });
     }
 
-    const attendance = await prisma.attendance.findFirst({
+    const attendance: Attendance | null = await prisma.attendance.findFirst({
       where: {
-        studentId: student_id
+        studentId: user.id
       }
     });
 
     if (attendance) {
-      return NextResponse.json({ message: 'Already present' });
+      return Response.json({ message: "Already present" });
     }
 
-    const register = await prisma.attendance.create({
+    await prisma.attendance.create({
       data: {
-        studentId: student_id,
+        studentId: user.id,
         attendancevalue: "present"
       }
     });
 
-    return NextResponse.json(register);
+    return Response.json({ message: "Present" });
   } catch (error) {
     console.error("Error:", error);
-    return NextResponse.json({ status: 500, error: "Internal Server Error" });
+    return Response.json({ status: 500, error: "Internal Server Error" });
   }
 }
 
-export async function GET() {
+export async function GET(): Promise<Response> {
   try {
-    // This line queries the database for all students and their attendances
-    const response = await prisma.student.findMany({
+    const response: (Student & { attendances: Attendance[] })[] = await prisma.student.findMany({
       include: {
         attendances: {
           where: {
             attendancevalue: "present"
           }
         }
-      }
+      },
+      
+      // select: {
+      //   id: true,
+      //   email: true,
+      //   Firstname: true,
+      //   lastname: true,
+      //   avatar: true,
+      //   rollNumber: true,
+      //   attendances: true
+      // }
     });
 
-    // Filter out students with no 'present' attendance
-    const filteredResponse = response.filter(student => student.attendances.length > 0);
-
-    // This line returns the filtered response as JSON
-    return NextResponse.json({ response: filteredResponse });
+    return Response.json({ response });
   } catch (error) {
-    // If there's an error, it's caught here and logged
     console.error("Error:", error);
-    // This line returns a 500 status code if there's an error
-    return NextResponse.json({ status: 500 });
+    return Response.json({ status: 500, error: "Internal Server Error" });
   }
 }

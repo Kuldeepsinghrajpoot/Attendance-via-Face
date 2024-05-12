@@ -21,6 +21,8 @@ export default function LandingPage() {
         <Work />
       </div>
       <Footer />
+
+      
     </>
 
   )

@@ -14,6 +14,8 @@ async function fetchData() {
 }
 async function AttendaceRecord() {
     const response = await fetchData()
+console.log("response here of ",response)
+    // return;
   return (
     <div className='px-7 '>
 

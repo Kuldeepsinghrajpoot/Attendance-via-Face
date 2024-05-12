@@ -1,7 +1,9 @@
 'use client'
+// import { toast } from "@/components/ui/use-toast"
 import ImageCapture from "./realtime"
 import { useRouter } from 'next/navigation'
-
+import { ToastAction } from "@radix-ui/react-toast"
+import { toast } from 'react-toastify';
 
 export default function TableDemo() {
   const router = useRouter()
@@ -14,8 +16,20 @@ export default function TableDemo() {
       body: JSON.stringify({ image: dataURL }),
     });
     const data = await response.json();
-    
-    console.log(data.id);
+
+  
+ 
+    toast.success(data[0], {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+   
     router.refresh()
 
 

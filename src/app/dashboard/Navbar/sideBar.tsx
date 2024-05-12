@@ -68,7 +68,7 @@ export  function SideBar() {
                             <div className='w-10 h-10 flex justify-center items-center text-center'>
                                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN1NAnlhSMbhwPtdLoWbm4WkAQu5qpPH_Hzw&usqp=CAU" alt="" />
                             </div>
-                            <div className='text-secondary-foreground'>{session?.user}</div>
+                            <div className='text-secondary-foreground'>{session?.user?.Firstname}</div>
                         </div>
                         <div>
                         </div>

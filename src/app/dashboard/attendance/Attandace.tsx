@@ -45,7 +45,7 @@ export default async function TableDemo() {
               return (
                 <TableRow key={id+1}>
                   <TableCell> {item?.rollNumber}</TableCell>
-                  <TableCell className=" uppercase"> {item?.fullName}</TableCell>
+                  <TableCell className=" uppercase"> {item?.Firstname}</TableCell>
                   {item.attendances.map((attendance: any) => (
                     <TableCell key={id+1} className="uppercase">{attendance.attendancevalue} </TableCell>
                   ))}
