@@ -8,27 +8,28 @@ datasource db {
 }
 
 model Student {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  email        String
-  fullName     String
-  password     String
-  rollNumber   String
-  attendances  Attendance[]
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  email       String       @unique
+  Firstname   String
+  lastname    String
+  avatar      String       @unique
+  password    String
+  rollNumber  String
+  attendances Attendance[]
 }
 
 //  this method of linking the method of attendace of students
 model Attendance {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt  DateTime  @default(now())
-  student    Student   @relation(fields: [studentId], references: [id])
-  studentId  String
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime @default(now())
+  student         Student  @relation(fields: [studentId], references: [id])
+  studentId       String   @db.ObjectId
   attendancevalue String
 }
 
-
 model Subject {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName  String      
+  subjectName  String
   viceSubjects Vicesubject[]
   // teacher      teacher       @relation(fields: [teacherId], references: [id])
   // teacherId    String
@@ -36,21 +37,20 @@ model Subject {
 
 model Vicesubject {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName String    
+  subjectName String
   subject     Subject    @relation(fields: [subjectId], references: [id])
-  subjectId   String
+  subjectId   String     @db.ObjectId // Define field name explicitly
   questions   Question[]
 }
 
 model Question {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  Question      String
+  question      String
   option1       String
   option2       String
   option3       String
   option4       String
   createdAt     DateTime    @default(now())
   viceSubject   Vicesubject @relation(fields: [viceSubjectId], references: [id])
-  viceSubjectId String
+  viceSubjectId String      @db.ObjectId // Define field name explicitly
 }
-
