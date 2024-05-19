@@ -14,3 +14,20 @@ This project is a face recognition-based attendance system built with Next.js an
 ```bash
 git clone https://github.com/Kuldeepsinghrajpoot/Attendance-via-Face.git
 cd Attendance-via-Face
+
+Attendance-via-Face/
+├── prisma/
+├── public/
+├── src/
+│   ├── pages/
+│   ├── styles/
+│   ├── components/
+├── .eslintrc.json
+├── .gitignore
+├── middleware.ts
+├── next.config.mjs
+├── package.json
+├── postcss.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+└── README.md
