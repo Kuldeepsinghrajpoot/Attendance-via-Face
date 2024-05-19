@@ -1,43 +1,48 @@
-import { PrismaClient, Student, Attendance } from "@prisma/client";
-import { authOptions } from "../auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
+import { Attendance, PrismaClient, Student } from "@prisma/client";
 
 const prisma = new PrismaClient();
 interface StudentRequest {
   avatar: string;
 }
 
+async function getAttendanceForDate(studentId: any, date: Date): Promise<Attendance | null> {
+  const attendance = await prisma.attendance.findFirst({
+    where: {
+      studentId,
+      createdAt: {
+        gte: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+        lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
+      }
+    }
+  });
+  return attendance;
+}
+
 export async function POST(request: Request): Promise<Response> {
-
- 
-
   try {
     const { avatar }: StudentRequest = await request.json();
-
+    // console.log(avatar)
     if (!avatar) {
-      return Response.json({ status: 400, error: "user not found" });
+      return new Response(JSON.stringify({ status: 400, error: "Avatar not provided" }), { status: 400 });
     }
 
     const user: Student | null = await prisma.student.findUnique({
-      where: {
-        avatar: `${avatar}.jpeg`
-      },
+      where: { avatar: `${avatar}.jpeg` },
     });
 
     if (!user) {
-      return Response.json({ status: 404, error: "User not found" });
+      return new Response(JSON.stringify({ status: 404, error: "User not found" }), { status: 404 });
     }
 
-    const attendance: Attendance | null = await prisma.attendance.findFirst({
-      where: {
-        studentId: user.id
-      }
-    });
+    // Check if user has already been marked present for today's date
+    const today = new Date();
+    const attendanceForToday = await getAttendanceForDate(user.id, today);
 
-    if (attendance) {
-      return Response.json({ message: "Already present" });
+    if (attendanceForToday) {
+      return new Response(JSON.stringify({ message: "Already present" }));
     }
 
+    // If user has not been marked present for today's date, create a new attendance record
     await prisma.attendance.create({
       data: {
         studentId: user.id,
@@ -45,38 +50,42 @@ export async function POST(request: Request): Promise<Response> {
       }
     });
 
-    return Response.json({ message: "Present" });
+    return new Response(JSON.stringify({ message: "Present" }));
   } catch (error) {
     console.error("Error:", error);
-    return Response.json({ status: 500, error: "Internal Server Error" });
+    return new Response(JSON.stringify({ status: 500, error: "Internal Server Error" }), { status: 500 });
   }
 }
 
 export async function GET(): Promise<Response> {
-  try {
-    const response: (Student & { attendances: Attendance[] })[] = await prisma.student.findMany({
-      include: {
-        attendances: {
-          where: {
-            attendancevalue: "present"
-          }
-        }
-      },
-      
-      // select: {
-      //   id: true,
-      //   email: true,
-      //   Firstname: true,
-      //   lastname: true,
-      //   avatar: true,
-      //   rollNumber: true,
-      //   attendances: true
-      // }
-    });
 
-    return Response.json({ response });
-  } catch (error) {
-    console.error("Error:", error);
-    return Response.json({ status: 500, error: "Internal Server Error" });
-  }
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+    try {
+        const response: (Student & { attendances: Attendance[] })[] = await prisma.student.findMany({
+            include: {
+                attendances: {
+                    where: { attendancevalue: "present",
+
+                    createdAt: {
+                      gte: currentDate, // Get attendance records from the current date onwards
+                      lt: new Date(currentDate.getTime() + 24 * 60 * 60 * 1000) // up to the end of the current date
+                  }
+                     },
+                    orderBy: { createdAt: "desc" }
+                }
+            },
+        });
+
+
+      
+
+    
+
+        return new Response(JSON.stringify({ response}));
+    } catch (error) {
+        console.error("Error:", error);
+        return new Response(JSON.stringify({ status: 500, error: "Internal Server Error" }), { status: 500 });
+    }
 }
+

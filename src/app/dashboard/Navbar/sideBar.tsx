@@ -38,20 +38,22 @@ export  function SideBar() {
             url: '../dashboard/',
             path:'/dashboard',
             'icon': <RxDashboard className='w-5 h-5' />
-        }, {
-            'title': "Quiz",
-            'url': '../dashboard/quiz',
-            path:'/quiz',
-            'icon': <IoMdAddCircleOutline className='w-5 h-5' />
-        }, {
-            'title': "QuizStatus",
-            'url': '../QuizStatus',
-            path:'/QuizStatus',
-            'icon': <GrStatusGood className='w-5 h-5' />
-        },{
+        },
+        //  {
+        //     'title': "Quiz",
+        //     'url': '../dashboard/quiz',
+        //     path:'/quiz',
+        //     'icon': <IoMdAddCircleOutline className='w-5 h-5' />
+        // }, {
+        //     'title': "QuizStatus",
+        //     'url': '../QuizStatus',
+        //     path:'/QuizStatus',
+        //     'icon': <GrStatusGood className='w-5 h-5' />
+        // }
+        {
             'title':'Attendace',
-            'url':'/AttendanceRecordTeacher',
-            path:'AttendanceRecordTeacher',
+            'url':'/record',
+            path:'record',
             icon:<GrStatusGood className='w-5 h-5' />
         }
     ]

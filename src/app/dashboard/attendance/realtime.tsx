@@ -1,6 +1,6 @@
 'use client'
-import { Card } from '@/components/ui/card';
-import React, { useRef, useState, useEffect } from 'react';
+
+import React, { useRef, useEffect } from 'react';
 
 interface ImageCaptureProps {
     onCapture: (imageData: string) => void;
@@ -9,13 +9,14 @@ interface ImageCaptureProps {
 const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [capturedImageData, setCapturedImageData] = useState<string>('');
 
     useEffect(() => {
+        let stream: MediaStream | null = null;
+
         const startCamera = async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                if (videoRef.current) {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                if (videoRef.current && stream) {
                     videoRef.current.srcObject = stream;
                 }
             } catch (error) {
@@ -29,6 +30,9 @@ const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
 
         return () => {
             clearInterval(intervalId); // Clear the interval when the component unmounts
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop()); // Stop all tracks in the stream
+            }
         };
     }, []);
 
@@ -36,9 +40,12 @@ const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
         if (videoRef.current && canvasRef.current) {
             const context = canvasRef.current.getContext('2d');
             if (context) {
-                context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-                const imageData = canvasRef.current.toDataURL('image/jpeg');
-                // setCapturedImageData(imageData);
+                const video = videoRef.current;
+                const canvas = canvasRef.current;
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = canvas.toDataURL('image/jpeg');
                 onCapture(imageData);
             }
         }
@@ -46,10 +53,8 @@ const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
 
     return (
         <div className=' rounded-md'>
-            
-            <video  className='w-96 rounded-md  shadow-xl' ref={videoRef} autoPlay />
+            <video className='w-96 rounded-md shadow-xl' ref={videoRef} autoPlay />
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-           
         </div>
     );
 }

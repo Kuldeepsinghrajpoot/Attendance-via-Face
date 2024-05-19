@@ -8,7 +8,7 @@ import { GrStatusGood } from "react-icons/gr";
 import { usePathname } from 'next/navigation';
 import { FaMarker, FaRecordVinyl } from 'react-icons/fa';
 import { recordTraceEvents } from 'next/dist/trace';
-// import Dashboard from '@/app/dashboard/page';
+import { format } from "date-fns"
 interface linkBar {
     title: string,
     url: string,
@@ -22,12 +22,12 @@ const Navbar = () => {
     // console.log(dynamicPart)
     // const router = usePathname();
     const linkBar: linkBar[] = [
-        {
-            'title': "Dashboard",
-            'url': '/dashboard',
-            'path': '/dashboard',
-            'icon': <RxDashboard className='w-5 h-5' />
-        },
+        // {
+        //     'title': "Dashboard",
+        //     'url': '/dashboard',
+        //     'path': '/dashboard',
+        //     'icon': <RxDashboard className='w-5 h-5' />
+        // },
         // }, {
         //     'title': "Quiz",
         //     'url': '/dashboard/quiz/',
@@ -52,8 +52,8 @@ const Navbar = () => {
             icon:<FaMarker/>
         },{
             'title':'Attendance Record',
-            'url':'/dashboard/AttendanceRecordTeacher',
-            path:'/dashboard/AttendanceRecordTeacher',
+            'url':`/dashboard/record?date=${format(new Date(),'MMM-dd-yyy')}`,
+            path:'/dashboard/record',
             icon: <FaRecordVinyl/>
         }
     ]

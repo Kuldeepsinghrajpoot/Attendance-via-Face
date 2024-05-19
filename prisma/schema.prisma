@@ -16,12 +16,15 @@ model Student {
   password    String
   rollNumber  String
   attendances Attendance[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
 }
 
 //  this method of linking the method of attendace of students
 model Attendance {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
   student         Student  @relation(fields: [studentId], references: [id])
   studentId       String   @db.ObjectId
   attendancevalue String
@@ -31,8 +34,8 @@ model Subject {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
   subjectName  String
   viceSubjects Vicesubject[]
-  // teacher      teacher       @relation(fields: [teacherId], references: [id])
-  // teacherId    String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
 }
 
 model Vicesubject {
@@ -41,16 +44,19 @@ model Vicesubject {
   subject     Subject    @relation(fields: [subjectId], references: [id])
   subjectId   String     @db.ObjectId // Define field name explicitly
   questions   Question[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now())
 }
 
 model Question {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  question      String
-  option1       String
-  option2       String
-  option3       String
-  option4       String
-  createdAt     DateTime    @default(now())
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  question String
+  option1  String
+  option2  String
+  option3  String
+  option4  String
   viceSubject   Vicesubject @relation(fields: [viceSubjectId], references: [id])
   viceSubjectId String      @db.ObjectId // Define field name explicitly
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
 }
