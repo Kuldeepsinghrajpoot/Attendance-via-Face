@@ -34,3 +34,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+# Attendance via Face
+
+This project is a face recognition-based attendance system built with Next.js and TypeScript.
+
+## Prerequisites
+
+- Node.js (version 14 or higher)
+- npm or yarn
+
+## Getting Started
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Kuldeepsinghrajpoot/Attendance-via-Face.git
+cd Attendance-via-Face
