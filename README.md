@@ -75,8 +75,8 @@ Attendance via Face is a system that automates attendance tracking using facial 
 - [base64](https://docs.python.org/3/library/base64.html)
 - [requests](https://docs.python-requests.org/en/latest/)
 
-### Installation
-You can install the required dependencies using pip:
+### Run server
+install all the required dependencies then run :
 
 ```bash
 uvicorn app:app --reload
