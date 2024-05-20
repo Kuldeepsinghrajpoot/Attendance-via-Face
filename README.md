@@ -39,6 +39,7 @@ Attendance via Face is a system that automates attendance tracking using facial 
    yarn dev
 
 2. Open your browser and navigate to http://localhost:3000.
+3. Replace `.env.temp` with `.env` and update the file with the basic requirements they are asking for.
 
 
 ### Technologies Used
