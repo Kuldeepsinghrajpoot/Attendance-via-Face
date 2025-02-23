@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
 import { Inter, M_PLUS_1 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -22,22 +26,20 @@ export const metadata: Metadata = {
 };
 
 // context api
-export default function DashboardLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}:RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className={cn("   h-full   antialiased bg-[#F8F7FA]  dark:bg-zinc-900 text-black dark:text-white  w-full ",
+      <body suppressHydrationWarning className={cn("   h-full   antialiased   dark:bg-zinc-900 text-black dark:text-white  w-full ",
         )}>
         {/* <Navbar/> */}
         <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
         <AuthProvider>
           <NextTopLoader />
 

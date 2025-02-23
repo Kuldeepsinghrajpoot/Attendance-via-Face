@@ -81,8 +81,8 @@ export const authOptions: { providers: any[] } = {
     },
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
-        signIn: "/Login",
-        signOut: '/Login'
+        signIn: "/",
+        signOut: '/'
     },
 } as any;
 

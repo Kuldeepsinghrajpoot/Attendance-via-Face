@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useRef, useEffect } from 'react';
 
@@ -9,14 +9,14 @@ interface ImageCaptureProps {
 const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const streamRef = useRef<MediaStream | null>(null); // Store stream reference
 
     useEffect(() => {
-        let stream: MediaStream | null = null;
-
         const startCamera = async () => {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                if (videoRef.current && stream) {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                streamRef.current = stream; // Store stream in ref
+                if (videoRef.current) {
                     videoRef.current.srcObject = stream;
                 }
             } catch (error) {
@@ -26,12 +26,12 @@ const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
 
         startCamera();
 
-        const intervalId = setInterval(captureImage, 1000); // Capture image every 1000 milliseconds (1 second)
+        const intervalId = setInterval(captureImage, 10000); // Capture image every 10 sec
 
         return () => {
-            clearInterval(intervalId); // Clear the interval when the component unmounts
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop()); // Stop all tracks in the stream
+            clearInterval(intervalId); // Clear interval when component unmounts
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop()); // Stop camera properly
             }
         };
     }, []);
@@ -52,11 +52,12 @@ const ImageCapture: React.FC<ImageCaptureProps> = ({ onCapture }) => {
     };
 
     return (
-        <div className=' rounded-md'>
+        <div className='rounded-md'>
             <video className='w-96 rounded-md shadow-xl' ref={videoRef} autoPlay />
+            <div></div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
         </div>
     );
-}
+};
 
 export default ImageCapture;

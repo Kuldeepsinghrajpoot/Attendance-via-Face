@@ -1,46 +1,47 @@
 'use client'
-// import { toast } from "@/components/ui/use-toast"
-import ImageCapture from "./realtime"
-import { useRouter } from 'next/navigation'
-import { ToastAction } from "@radix-ui/react-toast"
-import { toast } from 'react-toastify';
+import ImageCapture from "./realtime";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import React from "react";
+import axios from "axios";
 
-export default function TableDemo() {
-  const router = useRouter()
+export default function FaceVerify() {
+  const router = useRouter();
+
   const handleCapture = async (dataURL: string) => {
-    const response = await fetch('http://127.0.0.1:8000/verify-face', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ image: dataURL }),
-    });
-    const data = await response.json();
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/verify-face", {
+        image: dataURL,
+      });
+      router.refresh();
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-  
- 
-    toast.success(data[0], {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
-   
-    router.refresh()
+      const data = response.data;
 
+      if (data) {
+        toast.success(data[0], { position: "top-right", autoClose: 5000 });
+      } else {
+        toast.error(data?.message, {
+          position: "top-right",
+        });
+      }
 
-  }
+     
+    } catch (error) {
+      console.error("Error in handleCapture:", error);
+      toast.error("Failed to send image for verification!", {
+        position: "top-right",
+      });
+    }
+  };
 
   return (
-    <div className="md:flex md:justify-start ">
-      <div className=" rounded-md">
-          <ImageCapture onCapture={handleCapture} />
+    <div className="md:flex md:justify-start">
+      <div className="rounded-md">
+        <ImageCapture onCapture={handleCapture} />
       </div>
-   
     </div>
-  )
+  );
 }

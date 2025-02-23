@@ -28,7 +28,7 @@ export default function DatePickerDemo() {
 
     }
     
-  });
+  },[date]);
 
 
   return (

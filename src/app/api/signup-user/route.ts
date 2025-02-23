@@ -27,7 +27,7 @@ export async function POST(request: Request): Promise<Response> {
         const buffer = Buffer.from(dataBytes);
         const fileName = `${Date.now()}.jpeg`;
         const path = `./public/temp/${fileName}`;
-        await writeFile(path, buffer);
+        await writeFile(path, new Uint8Array(buffer));
 
         // Insert user data into the database
         await prisma.student.create({

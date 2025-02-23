@@ -4,9 +4,9 @@ import Record from './Record'
 import DatePickerDemo from './DatePicker'
 
 async function fetchData(date: any) {
-    // console.log('server', date)
+    console.log('serverasfasd', process.env.PORT)
     try {
-        const data = await axios(`http://localhost:3000/api/dashboard-attendance?date=${new Date(date)|| new Date()}`)
+        const data = await axios(`${process.env.NEXTAUTH_URL}/api/dashboard-attendance?date=${new Date(date)|| new Date()}`)
         return data.data
     } catch (error) {
         console.error('something went wrong', error)
@@ -19,7 +19,7 @@ async function AttendaceRecord({ searchParams }: any) {
         return (
             <div className='px-7 '>
                 <DatePickerDemo />
-                <Record Attendance={response.response} count={response.presentStudentsCount} totalStudent={response.totalstudent} />
+                <Record Attendance={response?.response} count={response?.presentStudentsCount} totalStudent={response?.totalstudent} />
             </div>
         );
     } catch (error) {
@@ -27,7 +27,4 @@ async function AttendaceRecord({ searchParams }: any) {
         return <div>Error fetching data</div>;
     }
 }
-
-
-
 export default AttendaceRecord

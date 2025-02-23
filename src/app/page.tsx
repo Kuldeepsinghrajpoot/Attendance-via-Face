@@ -1,29 +1,31 @@
-
-import React from 'react'
-import Navbar from './Navbar'
-import Carousel from './LandingPage/Carousel/page'
-import About from './LandingPage/About/page'
-import Work from './LandingPage/Work/page'
-import Footer from './LandingPage/Footer/page'
+import React from 'react';
+import Navbar from './Navbar';
+import HeroSection from './landing-page/HeroSection';
+import Features from './landing-page/Feature';
+import Footer from './landing-page/footer';
 
 export default function LandingPage() {
-
-
   return (
     <>
       <Navbar />
 
-      <div className=' '>
-        <Carousel />
-      </div>
-      <div className='px-5 rounded-md '>
-        <About />
-        <Work />
-      </div>
+      {/* Hero Section */}
+      <section className=" py-20 text-center ">
+        <HeroSection />
+      </section>
+
+      {/* About Section */}
+      <section className="px-6 py-10">
+        {/* <About /> */}
+      </section>
+
+      {/* Features Section */}
+      <section className=" py-12">
+        <Features />
+      </section>
+
+      {/* Footer */}
       <Footer />
-
-      
     </>
-
-  )
+  );
 }

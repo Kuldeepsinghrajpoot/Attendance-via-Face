@@ -16,7 +16,7 @@ export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
 
   const dateString = url.searchParams.get('date') as string;
-  const currentDate = new Date(dateString);
+  const currentDate = new Date(dateString) || new Date();
 
   // Set the time of currentDate to midnight
   currentDate.setHours(0, 0, 0, 0);

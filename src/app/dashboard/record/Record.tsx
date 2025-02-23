@@ -30,7 +30,7 @@ export default function TableDemo({ Attendance,count,totalStudent }: any) {
                 </TableHeader>
                 <TableBody>
 
-                    {Attendance.map((Attendance: any) => {
+                    {Attendance?.map((Attendance: any) => {
                         return (<TableRow key={Attendance.id}>
                             <TableCell className="font-medium">{Attendance?.rollNumber}</TableCell>
                             <TableCell></TableCell>
@@ -49,7 +49,7 @@ export default function TableDemo({ Attendance,count,totalStudent }: any) {
                     <TableRow>
                         <TableCell colSpan={2}>Total : {totalStudent}</TableCell>
                         <TableCell className="text-right">Present -  {count} </TableCell>
-                        <TableCell className="text-right">Absent - 0</TableCell>
+                        <TableCell className="text-right">Absent - {totalStudent-count}</TableCell>
                     </TableRow>
                 </TableFooter>
             </Table>

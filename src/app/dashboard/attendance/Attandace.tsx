@@ -35,7 +35,7 @@ export default async function TableDemo() {
       <div> {getDates(new Date())}</div>
        
        </div>
-        <Table >
+        <Table className="bg-inherit">
 
           <TableHeader>
             <TableRow>
