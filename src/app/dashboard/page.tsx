@@ -1,58 +1,56 @@
 'use client'
 
-
 import { useSession } from 'next-auth/react';
 import React from 'react';
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import CardWithForm from './dashboard/card';
+import { Chart } from './dashboard/chart';
+import { Calendars } from './dashboard/calendar';
+import { Subject } from './dashboard/subject-table';
+import { BarChart, User } from 'lucide-react';
 
 
-const page = () => {
- const{data:session}= useSession()
+const cartItem = [{
+  title: "Students",
+  Icon: BarChart,
+  data: 50,
+}, {
+  title: "Teacher",
+  Icon: User,
+  data: 50,
+}, {
+  title: "Attendance",
+  Icon: User,
+  data: 50,
+}]
+const Page = () => {
 
- console.log(session)
+
   return (
-    Array.from({length:3},(ind)=>(
-      <CardWithForm/>
-    ))
-  
+    <div className="p-4">
+      {/* Cards Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  justify-center">
+        {cartItem.map((dataItem, key) => (
+          <div className="flex justify-center" key={key}>
+            <CardWithForm dataItem={dataItem} />
+
+          </div>
+        ))}
+      </div>
+
+      {/* Charts & Calendar Section */}
+      <div className="flex flex-wrap justify-center  w-full gap-4 mt-6  ">
+        <div className="flex-1 min-w-[300px] h-full">
+          <Chart />
+        </div>
+        <div className=" h-full">
+          <Calendars />
+        </div>
+      </div>
+      <div className='bg-background  p-5 my-5 rounded'>
+        <Subject />
+      </div>
+    </div>
   );
-}
+};
 
-
-
-export function CardWithForm() {
-  return (
-    <Card className="w-[350px] grid col-span-3">
-      <CardHeader>
-        <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Deploy</Button>
-      </CardFooter>
-    </Card>
-  )
-}
-
-export default page;
+export default Page;
