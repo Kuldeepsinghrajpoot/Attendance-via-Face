@@ -14,11 +14,9 @@ import {
 export default function TableDemo({ Attendance,count,totalStudent }: any) {
 
     return (
-        <>
-            <div className="flex justify-between  w-full gap-4 pt-2 pb-6">
-              
-            </div>
-            <Table className=" bg-background shadow-md rounded-md">
+        <div >
+            
+            <Table className="  ">
                 <TableCaption>A list of your recent invoices.</TableCaption>
                 <TableHeader>
                     <TableRow>
@@ -53,6 +51,6 @@ export default function TableDemo({ Attendance,count,totalStudent }: any) {
                     </TableRow>
                 </TableFooter>
             </Table>
-        </>
+        </div>
     )
 }

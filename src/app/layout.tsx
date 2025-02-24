@@ -32,7 +32,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={cn("   h-full   antialiased   dark:bg-zinc-900 text-black dark:text-white  w-full ",
-        )}>
+       
+       )}
+       data-new-gr-c-s-check-loaded="14.1209.0"
+       data-gr-ext-installed=""
+       >
         {/* <Navbar/> */}
         <ThemeProvider
             attribute="class"

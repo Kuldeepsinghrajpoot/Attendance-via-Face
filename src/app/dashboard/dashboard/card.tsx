@@ -1,18 +1,21 @@
 'use client'
 
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function CardWithForm({ dataItem }: any) {
     const { title, Icon, data } = dataItem;
     return (
-        <Card className="w-[400px] grid col-span-3 gap-5 space-x-5">
-            <CardHeader>
-                <CardTitle>
-                    <Icon   className=" h-10 w-10 text-primary "/>
-                </CardTitle>
-                <CardDescription>{title}</CardDescription>
-                <CardDescription>{data}</CardDescription>
+        <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium'>{title}</CardTitle>
+          <Icon/>
             </CardHeader>
+            <CardContent>
+                <div className='text-2xl font-bold'>+{data}</div>
+                <p className='text-xs text-muted-foreground'>
+                    +{data}% from last month
+                </p>
+            </CardContent>
         </Card>
     )
 }
