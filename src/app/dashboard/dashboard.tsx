@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import { useTheme } from 'next-themes';
-import { Bell, Home, Menu, User, Plus, UserCircle2, TimerIcon, PlusCircle } from "lucide-react";
+import { Bell, Home, Menu, User, Plus, UserCircle2, TimerIcon, PlusCircle, CheckCheck } from "lucide-react";
 import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
 import {
@@ -25,17 +25,17 @@ export default function Dashboard({ children }: { children:any}) {
   // Define navigation items
   const navItems = [
     { name: "Dashboard", icon: Home, href: "/dashboard" },
-    { name: "Attendence", icon: User, href: "/dashboard/attendance" },
-    { name: "Record", icon: Plus, href: `/dashboard/record?date=${format(new Date(), 'MMM-dd-yyyy')}` },
-    { name: "Student", icon: Plus, href: `/dashboard/student` },
+    { name: "Mark Attendence", icon: CheckCheck, href: "/dashboard/attendance" },
+    { name: "Attendace Record", icon: Plus, href: `/dashboard/record?date=${format(new Date(), 'MMM-dd-yyyy')}` },
+    { name: "Student", icon: User, href: `/dashboard/student` },
     { name: "Add Subject", icon: PlusCircle, href: `/dashboard/add-subject` },
     { name: "Schedule Attendance", icon: TimerIcon, href: `/dashboard/schedule-attendance` },
 
   ];
 
   // Filter navigation items based on the user's role
-  const filteredNavItems = user?.role === "Doctor"
-    ? navItems.filter(item => ["Dashboard", "Profile", "Patients"].includes(item.name))
+  const filteredNavItems = user?.role === "Student"
+    ? navItems.filter(item => ["Dashboard", "Settings", "Mark Attendance"].includes(item.name))
     : navItems;
 
   return (
