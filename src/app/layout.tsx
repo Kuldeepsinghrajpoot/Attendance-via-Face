@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 
+import type { Metadata } from "next";
 interface RootLayoutProps {
   children: React.ReactNode;
 }
@@ -17,6 +17,8 @@ import { AuthProvider } from "./Provider";
 import { Toaster } from "@/components/ui/toaster"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Search } from "@/components/search";
+import { TanstackProvider } from "@/hooks/tanstack-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,34 +30,37 @@ export const metadata: Metadata = {
 // context api
 export default function RootLayout({
   children,
-}:RootLayoutProps) {
+}: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={cn("   h-full   antialiased   dark:bg-zinc-900 text-black dark:text-white  w-full ",
-       
-       )}
-       data-new-gr-c-s-check-loaded="14.1209.0"
-       data-gr-ext-installed=""
-       >
+
+      )}
+        data-new-gr-c-s-check-loaded="14.1209.0"
+        data-gr-ext-installed=""
+      >
         {/* <Navbar/> */}
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-        <AuthProvider>
-          <NextTopLoader />
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
 
-       
-          {children}
-        
-        </AuthProvider>
-        <Toaster />
-        <ToastContainer/>
+            <NextTopLoader />
+
+            <TanstackProvider>
+
+              {children}
+            </TanstackProvider>
+
+          </AuthProvider>
+          <Toaster />
+          <ToastContainer />
         </ThemeProvider>
       </body>
-     
+
     </html>
   );
 }

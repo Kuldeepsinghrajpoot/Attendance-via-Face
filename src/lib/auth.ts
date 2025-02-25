@@ -1,27 +1,25 @@
 import { PrismaClient, Student } from "@prisma/client";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+import GoogleProvider from 'next-auth/providers/google'
 // Prisma client for accessing the database
 const prisma = new PrismaClient();
+
 
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
-            name: "credentials",
+            name: 'credentials',
             credentials: {},
             async authorize(credentials) {
                 try {
                     // Extract email from credentials
-                    const { email, password } = credentials as {
-                        email: string;
-                        password: string;
-                    };
+                    const { email, password } = credentials as { email: string, password: string };
                     // Query the database to find a user with the provided email
                     const user: any = await prisma.student.findUnique({
                         where: {
                             email: email,
-                        },
+                        }
                     });
 
                     if (!user || user === null) {
@@ -32,12 +30,12 @@ export const authOptions: NextAuthOptions = {
                     // If user found, check if passwords match
                     if (user.password === password) {
                         return {
-                            id: user.id.toString(),
-                            email: user.email,
-                            role: user.role ?? "Admin",
-                            Firstname: user.Firstname,
+                            id:user.id.toString(),
+                            email:user.email,
+                            role:user.role ?? "Admin",
+                            Firstname:user.Firstname,
                             rollNumber: user.rollNumber,
-                            avatar: user.avatar,
+                            avatar: user.avatar
                         }; // Return user object if password matches
                     } else {
                         // If passwords don't match, return null
@@ -48,42 +46,48 @@ export const authOptions: NextAuthOptions = {
                     console.error("Error:", error);
                     return null;
                 }
-            },
+            }
+
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        }),
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+        })
     ],
 
     callbacks: {
         async jwt({ token, user }: any) {
             if (user) {
-                token.id = user.id?.toString();
-                token.rollNumber = user.rollNumber;
-                token.name = user.Firstname;
-                token.avatar = user.avatar;
-                token.email = user.email;
-                token.role = user;
+                token.id = user.id?.toString()
+                token.rollNumber = user.rollNumber
+                token.name = user.Firstname
+                token.avatar = user.avatar
+                token.email = user.email
+                token.role = user
+
             }
-            return token;
+            return token
         },
         async session({ session, token }: any) {
             if (token) {
-                session.user.id = token.id as string;
-                session.user.role = token.role as string;
-            }
-            return session;
-        },
-    },
+                session.user.id = token.id as string
+                session.user.role = token.role as string
 
-    pages: {
-        signIn: "/",
-        signOut: "/",
+            }
+            return session
+        }
+
     },
-    session: {
-        strategy: "jwt",
-        maxAge: 30 * 24 * 60 * 60,
+    async signIn({ account, profile }:any) {
+        if (account.provider === "google") {
+            return profile;
+        }
+        return true; // Do different verification for other providers that don't have `email_verified`
     },
     secret: process.env.NEXTAUTH_SECRET,
-};
+    pages: {
+        signIn: "/",
+        signOut: '/'
+    },
+} as any;
+

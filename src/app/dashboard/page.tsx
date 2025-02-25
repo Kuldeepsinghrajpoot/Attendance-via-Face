@@ -6,29 +6,35 @@ import CardWithForm from "./dashboard/card";
 import { Chart } from "./dashboard/chart";
 import { Calendars } from "./dashboard/calendar";
 import { Subject } from "./dashboard/subject-table";
-import { BarChart, CheckCircle, User, UserCheck2Icon, ViewIcon } from "lucide-react";
+import {
+    BarChart,
+    CheckCircle,
+    User,
+    UserCheck2Icon,
+    ViewIcon,
+} from "lucide-react";
 
 const cartItem = [
-  {
-    title: "Students",
-    Icon: UserCheck2Icon,
-    data: 500,
-  },
-  {
-    title: "Teachers", // Fixed singular/plural inconsistency
-    Icon: User,
-    data: 50,
-  },
-  {
-    title: "Attendance",
-    Icon: CheckCircle, // Changed icon to differentiate
-    data: 50,
-  },
-  {
-    title: "Visitor",
-    Icon: ViewIcon, // Changed icon to differentiate
-    data: +1500,
-  },
+    {
+        title: "Students",
+        Icon: UserCheck2Icon,
+        data: 500,
+    },
+    {
+        title: "Teachers", // Fixed singular/plural inconsistency
+        Icon: User,
+        data: 50,
+    },
+    {
+        title: "Attendance",
+        Icon: CheckCircle, // Changed icon to differentiate
+        data: 50,
+    },
+    {
+        title: "Visitor",
+        Icon: ViewIcon, // Changed icon to differentiate
+        data: +1500,
+    },
 ];
 const Page = () => {
     return (

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import { useTheme } from 'next-themes';
-import { Bell, Home, Menu, User, Plus, UserCircle2 } from "lucide-react";
+import { Bell, Home, Menu, User, Plus, UserCircle2, TimerIcon, PlusCircle } from "lucide-react";
 import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,9 @@ export default function Dashboard({ children }: { children:any}) {
     { name: "Dashboard", icon: Home, href: "/dashboard" },
     { name: "Attendence", icon: User, href: "/dashboard/attendance" },
     { name: "Record", icon: Plus, href: `/dashboard/record?date=${format(new Date(), 'MMM-dd-yyyy')}` },
+    { name: "Student", icon: Plus, href: `/dashboard/student` },
+    { name: "Add Subject", icon: PlusCircle, href: `/dashboard/add-subject` },
+    { name: "Schedule Attendance", icon: TimerIcon, href: `/dashboard/schedule-attendance` },
 
   ];
 
@@ -130,7 +133,7 @@ export default function Dashboard({ children }: { children:any}) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem><Link href="/dashboard/update-password">Settings</Link></DropdownMenuItem>
+              <DropdownMenuItem><Link href="/dashboard/settings/profile">Settings</Link></DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">Logout</DropdownMenuItem>
