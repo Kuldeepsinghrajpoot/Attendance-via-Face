@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
-import { useTheme } from 'next-themes';
 import { Bell, Home, Menu, User, Plus, UserCircle2, TimerIcon, PlusCircle, CheckCheck } from "lucide-react";
 import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SwitchDemo } from "../switch";
 
 export default function Dashboard({ children }: { children:any}) {
-  const { theme, setTheme } = useTheme(); // Destructure theme and setTheme
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
