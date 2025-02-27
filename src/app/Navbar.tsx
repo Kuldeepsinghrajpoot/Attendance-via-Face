@@ -4,7 +4,7 @@ import { ModeToggle } from '../darkMode/darkMode'
 import { Ghost, HistoryIcon, HomeIcon, User, UserPlus2Icon } from 'lucide-react'
 import { FaRegistered, FaRegRegistered } from 'react-icons/fa'
 import { Login } from './(Auth)/login'
-import Register from './(Auth)/register/page'
+import Register from './(Auth)/registe/page'
 import { Button } from '@/components/ui/button'
 
 interface authUser {
