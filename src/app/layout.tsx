@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 interface RootLayoutProps {
     children: React.ReactNode;
 }
+
 import { Inter, M_PLUS_1 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";

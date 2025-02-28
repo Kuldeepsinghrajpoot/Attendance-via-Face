@@ -42,6 +42,9 @@ app.add_middleware(
 class Image(BaseModel):
     image: str
 
+# Dictionary to store students who have already been marked present
+attendance_cache = {}
+
 @app.post("/verify-face")
 async def verify_face(image: Image, background_tasks: BackgroundTasks):
     # Validate base64 string
@@ -61,8 +64,6 @@ async def verify_face(image: Image, background_tasks: BackgroundTasks):
         if not cv2.imwrite(temp_image_path, frame):
             raise HTTPException(status_code=500, detail="Failed to save temp image")
 
-        match_found = False
-
         for file in os.listdir(KNOWN_FACES_DIR):
             known_image_path = os.path.join(KNOWN_FACES_DIR, file)
             try:
@@ -70,8 +71,16 @@ async def verify_face(image: Image, background_tasks: BackgroundTasks):
                 if result.get("verified"):
                     name = os.path.splitext(file)[0]
                     student_id = name  # Assuming name is the student ID
+
+                    # Check if the student is already marked present
+                    if student_id in attendance_cache:
+                        os.remove(temp_image_path)
+                        return {"id": name, "response": "Attendance already recorded"}
+
+                    # Mark attendance
+                    attendance_cache[student_id] = True
                     background_tasks.add_task(send_attendance, student_id)
-                    
+
                     # Cleanup temp file
                     os.remove(temp_image_path)
                     return {"id": name, "response": "Attendance recorded"}
@@ -81,9 +90,8 @@ async def verify_face(image: Image, background_tasks: BackgroundTasks):
 
         # Cleanup temp file if no match found
         os.remove(temp_image_path)
-
         return {"id": ""}
-    
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
 

@@ -30,33 +30,21 @@ model Attendance {
   attendancevalue String
 }
 
-model Subject {
+model Branch {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
   subjectName  String
-  viceSubjects Vicesubject[]
+  Subject Subject[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @default(now())
 }
 
-model Vicesubject {
+model Subject {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
   subjectName String
-  subject     Subject    @relation(fields: [subjectId], references: [id])
-  subjectId   String     @db.ObjectId // Define field name explicitly
-  questions   Question[]
+  Branch     Branch    @relation(fields: [BranchId], references: [id])
+  BranchId   String     @db.ObjectId // Define field name explicitly
+ 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @default(now())
 }
 
-model Question {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  question String
-  option1  String
-  option2  String
-  option3  String
-  option4  String
-  viceSubject   Vicesubject @relation(fields: [viceSubjectId], references: [id])
-  viceSubjectId String      @db.ObjectId // Define field name explicitly
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @default(now())
-}
