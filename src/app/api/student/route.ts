@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest): Promise<any> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   const id = await req.nextUrl.searchParams.get('id');
   // if (!id) return NextResponse.json('User not Authorize')
   try {

@@ -5,7 +5,7 @@ import DatePickerDemo from './DatePicker'
 
 async function fetchData(date: any) {
     try {
-        const data = await axios(`${process.env.NEXTAUTH_URL}/api/dashboard-attendance?date=${new Date(date)|| new Date()}`)
+        const data = await axios(`${process.env.NEXTAUTH_URL}/api/mark-attendance?date=${new Date(date)|| new Date()}`)
         return data.data
     } catch (error) {
         console.error('something went wrong', error)

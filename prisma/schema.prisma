@@ -31,20 +31,48 @@ model Attendance {
 }
 
 model Branch {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName  String
-  Subject Subject[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now())
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName String
+  Subject     Subject[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
 }
 
 model Subject {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   subjectName String
-  Branch     Branch    @relation(fields: [BranchId], references: [id])
-  BranchId   String     @db.ObjectId // Define field name explicitly
- 
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now())
+  Branch      Branch   @relation(fields: [BranchId], references: [id])
+  BranchId    String   @db.ObjectId // Define field name explicitly
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  teacher     teacher? @relation(fields: [teacherId], references: [id])
+  teacherId   String?  @db.ObjectId
 }
 
+enum RoleType {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum AttendanceValue {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model teacher {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  email     String    @unique
+  password  String
+  role      String
+  subject   Subject[]
+  subjectId String?    @unique @db.ObjectId
+  Firstname String
+  lastname  String?
+  phone     String
+    createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}

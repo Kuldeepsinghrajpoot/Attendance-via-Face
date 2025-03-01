@@ -11,7 +11,7 @@ import axios from "axios";
 import { CalendarIcon } from "lucide-react";
 
 async function fetchData() {
-  const response = await axios('http://localhost:3000/api/attendance');
+  const response = await axios(`${process.env.NEXTAUTH_URL}/api/attendance`);
   return response.data
 }
 export default async function TableDemo() {

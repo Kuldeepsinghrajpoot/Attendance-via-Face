@@ -47,7 +47,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/signup-user', {
+      const response = await fetch(`${process.env.NEXTAUTH_URL}/api/signup`, {
         method: 'POST',
         body: formData
       });

@@ -34,23 +34,25 @@ export async function POST(request: Request): Promise<Response> {
       return new Response(JSON.stringify({ status: 404, error: "User not found" }), { status: 404 });
     }
 
-    // Check if user has already been marked present for today's date
+    // Check if user has already been marked PRESENT for today's date
     const today = new Date();
     const attendanceForToday = await getAttendanceForDate(user.id, today);
 
     if (attendanceForToday) {
-      return new Response(JSON.stringify({ message: "Already present" }));
+      return new Response(JSON.stringify({ message: "Already PRESENT",id:user.id }));
     }
 
-    // If user has not been marked present for today's date, create a new attendance record
+    // If user has not been marked PRESENT for today's date, create a new attendance record
     await prisma.attendance.create({
       data: {
         studentId: user.id,
-        attendancevalue: "present"
+        attendancevalue: "PRESENT",
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     });
 
-    return new Response(JSON.stringify({ message: "Present" }));
+    return new Response(JSON.stringify({ message: "PRESENT",id:user.id }));
   } catch (error) {
     console.error("Error:", error);
     return new Response(JSON.stringify({ status: 500, error: "Internal Server Error" }), { status: 500 });
@@ -65,7 +67,7 @@ export async function GET(): Promise<Response> {
         const response: (Student & { attendances: Attendance[] })[] = await prisma.student.findMany({
             include: {
                 attendances: {
-                    where: { attendancevalue: "present",
+                    where: { attendancevalue: "PRESENT",
 
                     createdAt: {
                       gte: currentDate, // Get attendance records from the current date onwards

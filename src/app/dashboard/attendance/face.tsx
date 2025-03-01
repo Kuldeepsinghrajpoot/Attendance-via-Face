@@ -10,7 +10,7 @@ export default function FaceVerify() {
 
   const handleCapture = async (dataURL: string) => {
     try {
-      const response = await axios.post("http://127.0.0.1:5000/verify-face", {
+      const response = await axios.post(`${process.env.FAST_API}/verify-face`, {
         image: dataURL,
       });
       router.refresh();

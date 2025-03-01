@@ -1,4 +1,5 @@
 import { PrismaClient, Student, Attendance } from "@prisma/client";
+import { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +13,7 @@ function getCurrentDate(): string {
 
 // this is a get method of returing the values
 
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   const url = new URL(request.url);
 
   const dateString = url.searchParams.get('date') as string;
@@ -49,7 +50,6 @@ export async function GET(request: Request): Promise<Response> {
     });
     // total students are in the class room
     const totalstudent = await prisma.student.count();
-
 
     return new Response(JSON.stringify({ response, presentStudentsCount,totalstudent }));
   } catch (error) {
