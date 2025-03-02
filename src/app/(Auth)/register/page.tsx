@@ -47,8 +47,11 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXTAUTH_URL}/api/signup`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PORT}/api/signup`, {
         method: 'POST',
+        headers:{
+          "Content-type":"application/json"
+        },
         body: formData
       });
 

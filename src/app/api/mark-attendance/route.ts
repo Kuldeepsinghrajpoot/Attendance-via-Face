@@ -2,15 +2,6 @@ import { PrismaClient, Student, Attendance } from "@prisma/client";
 import { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
-
-
-function getCurrentDate(): string {
-  const currentDate = new Date();
-  return currentDate.toISOString();
-}
-
-
-
 // this is a get method of returing the values
 
 export async function GET(request: NextRequest): Promise<Response> {
@@ -26,7 +17,7 @@ export async function GET(request: NextRequest): Promise<Response> {
       include: {
         attendances: {
           where: {
-            attendancevalue: "present",
+            attendancevalue: "PRESENT",
 
             createdAt: {
               gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
@@ -36,12 +27,15 @@ export async function GET(request: NextRequest): Promise<Response> {
 
         }
       },
+      where:{
+        role:"STUDENT"
+      }
     });
 
     // Get the count of students who have attended on the current date
     const presentStudentsCount = await prisma.attendance.count({
       where: {
-        attendancevalue: "present",
+        attendancevalue: "PRESENT",
         createdAt: {
           gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
           lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
@@ -49,7 +43,11 @@ export async function GET(request: NextRequest): Promise<Response> {
       }
     });
     // total students are in the class room
-    const totalstudent = await prisma.student.count();
+    const totalstudent = await prisma.student.count({
+      where:{
+        role:"STUDENT"
+      }
+    });
 
     return new Response(JSON.stringify({ response, presentStudentsCount,totalstudent }));
   } catch (error) {

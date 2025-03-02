@@ -5,13 +5,13 @@ import DatePickerDemo from './DatePicker'
 
 async function fetchData(date: any) {
     try {
-        const data = await axios(`${process.env.NEXTAUTH_URL}/api/mark-attendance?date=${new Date(date)|| new Date()}`)
+        const data = await axios.get(`${process.env.NEXTAUTH_URL}/api/mark-attendance?date=${new Date(date)|| new Date()}`)
         return data.data
     } catch (error) {
         console.error('something went wrong', error)
     }
 }
-async function AttendaceRecord({ searchParams }: any) {
+async function AttendaceRecord({searchParams}:any) {
     const {date} = await searchParams;
     try {
         const response = await fetchData( date);

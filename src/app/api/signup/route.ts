@@ -6,8 +6,6 @@ const prisma = new PrismaClient();
 export async function POST(request: Request): Promise<Response> {
     try {
         const formData = await request.formData();
-
-        console.log(formData)
         const userData: UserSchema = {
             Firstname: formData.get("Firstname") as string,
             lastname: formData.get("lastname") as string,
@@ -21,7 +19,6 @@ export async function POST(request: Request): Promise<Response> {
         if (!userData.Firstname || !userData.lastname || !userData.rollNumber || !userData.email || !userData.password || !userData.avatar) {
             throw new Error("All fields are required.");
         }
-        console.log(userData.avatar)
         // Process avatar file
         const dataBytes = await userData.avatar.arrayBuffer();
         const buffer = Buffer.from(dataBytes);
@@ -32,6 +29,7 @@ export async function POST(request: Request): Promise<Response> {
         // Insert user data into the database
         await prisma.student.create({
             data: {
+                role:"STUDENT",
                 Firstname: userData.Firstname,
                 lastname: userData.lastname,
                 rollNumber: userData.rollNumber,

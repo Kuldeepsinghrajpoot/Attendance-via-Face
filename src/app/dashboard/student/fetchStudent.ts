@@ -23,6 +23,6 @@ export default async function fetchStudent() {
 
     const data = await auth()
     const response = await getStudent({ id: data?.id });
-
+    
    return response;
 }

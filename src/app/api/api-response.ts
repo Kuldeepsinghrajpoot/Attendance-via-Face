@@ -1,10 +1,10 @@
-interface ResponseType<T = unknown> {
+interface ResponseType<T> {
     status: number;
     data: T;
-    message?: string;  // Made optional with a default
+    message?: string; // Made optional with a default
 }
 
-export class ApiResponse<T = unknown> {
+export class ApiResponse<T> {
     status: number;
     data: T;
     message: string;
@@ -15,4 +15,3 @@ export class ApiResponse<T = unknown> {
         this.message = message;
     }
 }
-

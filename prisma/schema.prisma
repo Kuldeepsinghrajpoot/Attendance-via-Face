@@ -18,6 +18,7 @@ model Student {
   attendances Attendance[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
+  role        RoleType
 }
 
 //  this method of linking the method of attendace of students
@@ -45,7 +46,7 @@ model Subject {
   BranchId    String   @db.ObjectId // Define field name explicitly
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
-  teacher     teacher? @relation(fields: [teacherId], references: [id])
+  Teacher     Roles?    @relation(fields: [teacherId], references: [id])
   teacherId   String?  @db.ObjectId
 }
 
@@ -62,17 +63,17 @@ enum AttendanceValue {
   EXCUSED
 }
 
-model teacher {
+model Roles {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   /// Field referred in an index, but found no data to define the type.
   email     String    @unique
   password  String
-  role      String
+  role      RoleType
   subject   Subject[]
-  subjectId String?    @unique @db.ObjectId
-  Firstname String
-  lastname  String?
+  subjectId String?  
+  firstName String
+  lastName  String?
   phone     String
-    createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
 }

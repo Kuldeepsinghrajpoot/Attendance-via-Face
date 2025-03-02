@@ -21,7 +21,6 @@ export default function LandingPage() {
   return (
     <>
       <Navbar />
-
       {/* Hero Section */}
       <section className=" py-20 text-center ">
         <HeroSection />

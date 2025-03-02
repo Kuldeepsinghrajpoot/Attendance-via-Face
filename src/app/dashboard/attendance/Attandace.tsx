@@ -11,12 +11,13 @@ import axios from "axios";
 import { CalendarIcon } from "lucide-react";
 
 async function fetchData() {
-  const response = await axios(`${process.env.NEXTAUTH_URL}/api/attendance`);
+  const response = await axios.get(`${process.env.NEXTAUTH_URL}/api/attendance`);
   return response.data
 }
 export default async function TableDemo() {
 
-  const Information = await fetchData()
+  const information = await fetchData()
+ 
   function getDates(dateString: any): string {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -45,7 +46,7 @@ export default async function TableDemo() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Information?.response?.map((item: any, id: number) => {
+            {information?.response?.map((item: any, id: number) => {
               return (
                 <TableRow key={id + 1}>
                   <TableCell> {item?.rollNumber}</TableCell>

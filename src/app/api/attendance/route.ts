@@ -75,15 +75,12 @@ export async function GET(): Promise<Response> {
                   }
                      },
                     orderBy: { createdAt: "desc" }
-                }
-            },
+                },
+              },
+             where:{
+              role:"STUDENT"
+             }
         });
-
-
-      
-
-    
-
         return new Response(JSON.stringify({ response}));
     } catch (error) {
         console.error("Error:", error);

@@ -1,20 +1,37 @@
-import React from 'react'
-import { Role } from './role-table'
-import { RoleForm } from './role'
+import React from "react";
+import { Role } from "./role-table";
+import { RoleForm } from "./role";
+import { auth } from "@/app/api/auth";
+import axios from "axios";
 
-
-function page() {
-  return (
-    <section className=' p-4 rounded-md  shadow-sm'>
-      <div className='flex justify-start gap-2 h-12 max-h-min'>
-        <RoleForm/>
-        {/* <SelectSubject/> */}
-      </div>
-      <div className='bg-background border rounded-md p-4 my-4'>
-        <Role/>
-      </div>
-    </section>
-  )
+async function getData({ id }: { id: string }) {
+    try {
+        const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_PORT}/api/role?id=${id}`
+        );
+        return res.data;
+    } catch (error) {
+        return "something went wrong";
+    }
 }
 
-export default page
+async function page() {
+    const response = await auth();
+    const id = response?.role;
+    const res = await getData({ id });
+    console.log(res)
+
+    return (
+        <section className=" p-4 rounded-md  shadow-sm">
+            <div className="flex justify-start gap-2 h-12 max-h-min">
+                <RoleForm />
+                {/* <SelectSubject/> */}
+            </div>
+            <div className="bg-background border rounded-md p-4 my-4">
+                <Role data={res?.data} />
+            </div>
+        </section>
+    );
+}
+
+export default page;

@@ -5,9 +5,13 @@ const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const id = await req.nextUrl.searchParams.get('id');
-  // if (!id) return NextResponse.json('User not Authorize')
+  if (!id) return NextResponse.json('User not Authorize')
   try {
-    const users = await prisma.student.findMany({});
+    const users = await prisma.student.findMany({
+      where:{
+        role:"STUDENT"
+      }
+    });
 
     if (users && users.length > 0) {
       return NextResponse.json({ users });
