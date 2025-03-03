@@ -13,9 +13,9 @@ export async function GET(request: NextRequest): Promise<Response> {
   // Set the time of currentDate to midnight
   currentDate.setHours(0, 0, 0, 0);
   try {
-    const response: (Student & { attendances: Attendance[] })[] = await prisma.student.findMany({
+    const response = await prisma.student.findMany({
       include: {
-        attendances: {
+        Attendance: {
           where: {
             attendancevalue: "PRESENT",
 

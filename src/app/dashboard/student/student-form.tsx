@@ -32,7 +32,7 @@ import { roleSchema, RoleSchema } from "@/schema/role-schema";
 import axios from "axios";
 
 
-export function SubjectForm() {
+export function StudentForm() {
     const { data: session, status } = useSession();
     console.log(session?.user?.id)
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -117,13 +117,13 @@ export function SubjectForm() {
             <DialogTrigger asChild>
                 <Button className="space-x-1" variant="secondary">
                     <User2 />
-                    <span>Add Role</span>
+                    <span>Add Student</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[625px]">
                 <DialogHeader>
                     <DialogTitle className="text-center text-xl font-semibold">
-                        Add new Role
+                        Add new Student
                     </DialogTitle>
                     <DialogDescription className="text-center text-gray-500">
                         Signup in to new account to continue.
@@ -224,7 +224,7 @@ export function SubjectForm() {
                                 className="w-full"
                                 variant="default"
                             >
-                                Login
+                                Create
                             </Button>
                         </DialogFooter>
                     </form>

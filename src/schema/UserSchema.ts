@@ -5,4 +5,8 @@ export interface UserSchema {
     email: string;
     password: string;
     avatar: File;
+    role: string;
+    phone: string;
+    batch: string;
+    branch: string;
 }

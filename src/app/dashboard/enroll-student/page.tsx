@@ -8,7 +8,7 @@ function page() {
     <section className=' p-4 rounded-md  '>
       <div className='flex justify-start gap-2 h-12 max-h-min'>
         <SubjectForm/>
-        {/* <SelectSubject/> */}
+        <SelectSubject/>
       </div>
       <div className='bg-background border rounded-md p-4 my-4'>
         <Subject/>

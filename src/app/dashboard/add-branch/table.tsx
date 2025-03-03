@@ -12,7 +12,7 @@ import axios from "axios";
 async function fetchSubject({ id }: { id: string }) {
   try {
     const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_PORT}/api/subject?id=${id}`,
+      `${process.env.NEXT_PUBLIC_PORT}/api/branch?id=${id}`,
       { timeout: 5000 }
     );
     return res.data; // Ensure this structure is correct in your API response
@@ -26,21 +26,20 @@ export async function Subject() {
   const response = await auth();
   const id = response?.id; // Ensure this is the correct identifier
   const res = await fetchSubject({ id });
-
   return (
     <Table className="w-full ">
       <TableHeader>
         <TableRow>
-          <TableHead className="text-left font-semibold">Subject ID</TableHead>
-          <TableHead className="text-right font-semibold">Subject Name</TableHead>
+          <TableHead className="text-left font-semibold">Branch ID</TableHead>
+          <TableHead className="text-right font-semibold">Branch Name</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {res?.data.length > 0 ? (
-          res.data.map((item: { id: string; subjectName: string }) => (
+          res.data.map((item: { id: string; branchName: string }) => (
             <TableRow key={item.id} className=" ">
               <TableCell className="py-2">{item.id}</TableCell>
-              <TableCell className="py-2 text-right">{item.subjectName}</TableCell>
+              <TableCell className="py-2 text-right">{item?.branchName}</TableCell>
             </TableRow>
           ))
         ) : (

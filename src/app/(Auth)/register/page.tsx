@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@radix-ui/react-toast"
 import { format } from "date-fns"
 import Image from "next/image"
+import axios from "axios"
 
 export default function Register() {
   const { toast } = useToast()
@@ -30,11 +31,15 @@ export default function Register() {
       password: '',
       email: '',
       avatar: undefined,
-      rollNumber: ''
+      rollNumber: '',
+      phone: '',
+      batch: '',
+      branch: ''
     }
   });
 
   const onSubmit = async (data: any) => {
+    console.log(data)
     const formData = new FormData();
     for (const key in data) {
       if (key === 'avatar' && data[key]) {
@@ -45,23 +50,22 @@ export default function Register() {
         formData.append(key, data[key]);
       }
     }
-
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_PORT}/api/signup`, {
-        method: 'POST',
-        headers:{
-          "Content-type":"application/json"
-        },
-        body: formData
-      });
-
-      if (response.ok) {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_PORT}/api/signup`,
+        formData, // Send formData directly
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      
+      const res =await response.data;
+      console.log(res)
+      if (res.status === 200) {
         toast({
           title: "Success",
           description: format(new Date(), "MMM dd, yyyy"),
           action: <ToastAction altText="Success">Account Created!</ToastAction>,
         });
-        reset();
+        // reset();
       } else {
         toast({
           title: "Error",
@@ -121,11 +125,27 @@ export default function Register() {
                   <Input id="rollNumber" placeholder="0901CS..." {...register('rollNumber')} />
                   {errors.rollNumber && <p className="text-red-500 text-xs">{errors.rollNumber.message}</p>}
                 </div>
+                <div>
+                  <Label htmlFor="phone">Phone number</Label>
+                  <Input id="phone" placeholder="phone" {...register('phone')} />
+                  {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
+                </div>
+              
+                <div>
+                  <Label htmlFor="batch">Batch</Label>
+                  <Input id="batch" placeholder="Batch" {...register('batch')} />
+                  {errors.batch && <p className="text-red-500 text-xs">{errors.batch.message}</p>}
+                </div>
 
                 <div>
                   <Label htmlFor="avatar">Profile Picture</Label>
                   <Input type="file" id="avatar" {...register('avatar')} className="cursor-pointer" />
                   {errors.avatar && <p className="text-red-500 text-xs">{errors.avatar.message}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="branch">Profile Picture</Label>
+                  <Input type="text" id="branch" {...register('branch')} className="cursor-pointer" />
+                  {errors.branch && <p className="text-red-500 text-xs">{errors.branch.message}</p>}
                 </div>
 
                 <div>

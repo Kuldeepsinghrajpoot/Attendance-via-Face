@@ -14,6 +14,7 @@ import {
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SwitchDemo } from "../switch";
+import React from "react";
 
 export default function Dashboard({ children }: { children:any}) {
   const pathname = usePathname();
@@ -21,18 +22,22 @@ export default function Dashboard({ children }: { children:any}) {
   const user = session?.user;
 
   // Define navigation items
-  const navItems = [
-    { name: "Dashboard", icon: Home, href: "/dashboard" },
-    { name: "Mark Attendence", icon: CheckCheck, href: "/dashboard/attendance" },
-    { name: "Attendace Record", icon: Plus, href: `/dashboard/record?date=${format(new Date(), 'MMM-dd-yyyy')}` },
-    { name: "Student", icon: User, href: `/dashboard/student` },
-    { name: "Add Subject", icon: PlusCircle, href: `/dashboard/add-subject` },
-    { name: "Schedule Attendance", icon: TimerIcon, href: `/dashboard/schedule-attendance` },
-    { name: "Role", icon: UserCog, href: `/dashboard/role` },
-
-  ];
+  const navItems = React.useMemo(
+    () => [
+      { name: 'Dashboard', icon: Home, href: '/dashboard' },
+      { name: 'Mark Attendance', icon: CheckCheck, href: '/dashboard/attendance' },
+      { name: 'Attendance Record', icon: PlusCircle, href: `/dashboard/record?date=${format(new Date(), 'MMM-dd-yyyy')}` },
+      { name: 'Student', icon: User, href: '/dashboard/student' },
+      { name: 'Add Subject', icon: PlusCircle, href: '/dashboard/add-subject' },
+      { name: 'Add branch', icon: PlusCircle, href: '/dashboard/add-branch' },
+      { name: 'Schedule Attendance', icon: TimerIcon, href: '/dashboard/schedule-attendance' },
+      { name: 'Role', icon: UserCog, href: '/dashboard/role' },
+      { name: 'Enroll Student', icon: UserCog, href: '/dashboard/enroll-student' },
+    ],
+    []
+  );
   // Filter navigation items based on the user's role
-  const filteredNavItems = user?.role === "Student"
+  const filteredNavItems = user?.role?.role === "ADMIN"
     ? navItems.filter(item => ["Dashboard", "Settings", "Mark Attendance"].includes(item.name))
     : navItems;
 
@@ -43,7 +48,7 @@ export default function Dashboard({ children }: { children:any}) {
         <div className="flex h-full max-h-screen flex-col gap-2 sticky top-0 bg-background">
           {/* Sidebar Header */}
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 bg-background">
-            <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+            <Link href="/dashboard" prefetch={false} className="flex items-center gap-2 font-semibold">
               <Image src="/vercel.svg" alt="logo" width={30} height={30} className="rounded-full" />
               <span>Attendance</span>
             </Link>
@@ -58,7 +63,7 @@ export default function Dashboard({ children }: { children:any}) {
             <nav className="grid z-50 items-start text-sm font-medium gap-1">
               <span className="capitalize text-sm font-medium my-1">DASHBOARD</span>
               {filteredNavItems.filter((_, index) => index === 0).map((item, index) => (
-                <Link
+                <Link prefetch={false}
                   key={index}
                   href={item.href}
                   className={`flex items-center gap-3 rounded px-3 py-2 transition-all hover:text-primary hover:bg-muted ${pathname === item.href ? '  bg-primary text-white ' : ' '}`}

@@ -7,47 +7,104 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Student {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  email       String       @unique
-  Firstname   String
-  lastname    String
-  avatar      String       @unique
-  password    String
-  rollNumber  String
-  attendances Attendance[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now())
-  role        RoleType
-}
-
-//  this method of linking the method of attendace of students
 model Attendance {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now())
-  student         Student  @relation(fields: [studentId], references: [id])
-  studentId       String   @db.ObjectId
-  attendancevalue String
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  student         Student         @relation(fields: [studentId], references: [id])
+  studentId       String          @db.ObjectId
+  attendancevalue AttendanceValue
 }
 
 model Branch {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName String
-  Subject     Subject[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  subjects   Subject[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  branchName String @unique
+  Student Student[]
 }
 
 model Subject {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName String
-  Branch      Branch   @relation(fields: [BranchId], references: [id])
-  BranchId    String   @db.ObjectId // Define field name explicitly
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  Teacher     Roles?    @relation(fields: [teacherId], references: [id])
-  teacherId   String?  @db.ObjectId
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName          String
+  branch               Branch?             @relation(fields: [branchId], references: [id])
+  branchId             String?             @db.ObjectId
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  role                 Roles?              @relation(fields: [roleId], references: [id])
+  roleId               String?             @db.ObjectId
+  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  scheduleAttendanceId String?             @db.ObjectId
+  Enroll               Enroll[]
+}
+
+model Roles {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  password  String
+  role      RoleType
+  subjects  Subject[]
+  firstName String
+  lastName  String?
+  phone     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Enroll    Enroll[]
+}
+
+model Batch {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  batch     String    @unique // Example: "A", "B", "C"
+  students  Student[] @relation("BatchToStudent")
+  enroll    Enroll[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  email      String       @unique
+  Firstname  String
+  lastname   String
+  avatar     String // Removed @unique if multiple students can have the same avatar
+  password   String
+  rollNumber String
+  batch      Batch?       @relation(fields: [batchId], references: [id], name: "BatchToStudent")
+  batchId    String?      @db.ObjectId
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  role       RoleType // If referencing `Roles`, it should be a relation instead
+  Enroll     Enroll[]
+  Attendance Attendance[]
+  phone      String?
+  branch     Branch?      @relation(fields: [branchId], references: [id])
+  branchId   String?      @db.ObjectId
+}
+
+model Enroll {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String   @db.ObjectId
+  teacher   Roles    @relation(fields: [teacherId], references: [id])
+  teacherId String   @db.ObjectId
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  subjectId String   @db.ObjectId
+  batch     Batch    @relation(fields: [batchId], references: [id])
+  batchId   String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  session   String
+  year      String
+}
+
+model ScheduleAttendance {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  subjects  Subject[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  fromTo    DateTime
+  upTo      DateTime
 }
 
 enum RoleType {
@@ -61,19 +118,4 @@ enum AttendanceValue {
   ABSENT
   LATE
   EXCUSED
-}
-
-model Roles {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  /// Field referred in an index, but found no data to define the type.
-  email     String    @unique
-  password  String
-  role      RoleType
-  subject   Subject[]
-  subjectId String?  
-  firstName String
-  lastName  String?
-  phone     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
 }

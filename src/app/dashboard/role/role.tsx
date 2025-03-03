@@ -21,6 +21,7 @@ import { User2 } from "lucide-react";
 import Swal from "sweetalert2";
 import {
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -41,12 +42,7 @@ export function RoleForm() {
     const form = useForm<RoleSchema>({
         resolver: zodResolver(roleSchema),
         defaultValues: {
-            email: "",
-            password: "",
-            role: "",
-            phone: "",
-            firstName: "",
-            lastName: "",
+            email: "", role: "", password: "", firstName: "", phone: "", lastName: ""
         },
     });
 
@@ -75,7 +71,7 @@ export function RoleForm() {
                 );
                 console.log(res)
                 Swal.close();
-                const response =  res;
+                const response = res;
                 if (response?.data?.status === 200) {
                     Swal.fire({
                         icon: "success",
@@ -136,38 +132,90 @@ export function RoleForm() {
                 <FormProvider {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="">
                         <div className="grid gap-4 grid-cols-2 py-4">
-                            {[
-                                "email",
-                                "role",
-                                "firstName",
-                                "lastName",
-                                "phone",
-                                "password",
-                            ].map((field) => (
-                                <FormField
-                                    key={field}
-                                    name={field as keyof RoleSchema}
-                                    control={form.control}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{field.name}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder={field.name}
-                                                    type={
-                                                        field.name ===
-                                                        "password"
-                                                            ? "password"
-                                                            : "text"
-                                                    }
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            ))}
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="shadcn" {...field} />
+                                        </FormControl>
+                                        <FormDescription>This is your public display name.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="shadcn" {...field} />
+                                        </FormControl>
+                                        <FormDescription>This is your public display name.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="shadcn" {...field} />
+                                        </FormControl>
+                                        <FormDescription>This is your public display name.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="shadcn" {...field} />
+                                        </FormControl>
+                                        <FormDescription>This is your public display name.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="role"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="shadcn" {...field} />
+                                        </FormControl>
+                                        <FormDescription>This is your public display name.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="shadcn" {...field} />
+                                        </FormControl>
+                                        <FormDescription>This is your public display name.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
 
                         <DialogFooter className="w-full ">

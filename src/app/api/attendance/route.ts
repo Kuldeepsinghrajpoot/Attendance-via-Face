@@ -1,4 +1,7 @@
 import { Attendance, PrismaClient, Student } from "@prisma/client";
+import { NextResponse } from "next/server";
+import { ApiResponse } from "../api-response";
+import { ApiError } from "../api-error";
 
 const prisma = new PrismaClient();
 interface StudentRequest {
@@ -26,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
       return new Response(JSON.stringify({ status: 400, error: "Avatar not provided" }), { status: 400 });
     }
 
-    const user: Student | null = await prisma.student.findUnique({
+    const user: Student | null = await prisma.student.findFirst({
       where: { avatar: `${avatar}.jpeg` },
     });
 
@@ -64,9 +67,9 @@ export async function GET(): Promise<Response> {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
     try {
-        const response: (Student & { attendances: Attendance[] })[] = await prisma.student.findMany({
+        const response = await prisma.student.findMany({
             include: {
-                attendances: {
+                Attendance: {
                     where: { attendancevalue: "PRESENT",
 
                     createdAt: {
@@ -81,10 +84,10 @@ export async function GET(): Promise<Response> {
               role:"STUDENT"
              }
         });
-        return new Response(JSON.stringify({ response}));
+        return NextResponse.json(new ApiResponse({ status: 200, data: response,message:"Fetched successfully" }));
     } catch (error) {
         console.error("Error:", error);
-        return new Response(JSON.stringify({ status: 500, error: "Internal Server Error" }), { status: 500 });
+        return NextResponse.json(new ApiError(500, "Internal Server Error", error));
     }
 }
 

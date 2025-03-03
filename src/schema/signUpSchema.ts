@@ -11,5 +11,9 @@ export const signUpSchema = z.object({
         }
         return value;
     }),
-    rollNumber: z.string().min(1, 'Roll number is required for registration')
+    rollNumber: z.string().min(1, 'Roll number is required for registration'),
+    // phone: z.string().min(0, 'Phone number is required for registration'),
+  
+    batch: z.string().min(1, 'Batch is required for registration'),
+    branch: z.string().min(1, 'Branch is required for registration'),
 });
