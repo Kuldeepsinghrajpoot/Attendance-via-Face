@@ -17,12 +17,14 @@ model Attendance {
 }
 
 model Branch {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
   subjects   Subject[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  branchName String @unique
-  Student Student[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  branchName String     @unique
+  students   Student[]
+
+  Roles Roles[]
 }
 
 model Subject {
@@ -32,25 +34,27 @@ model Subject {
   branchId             String?             @db.ObjectId
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
-  role                 Roles?              @relation(fields: [roleId], references: [id])
-  roleId               String?             @db.ObjectId
+  teacher              Roles?               @relation(fields: [teacherId], references: [id]) // Optional relation if needed.
+  teacherId            String?             @db.ObjectId
   scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
   Enroll               Enroll[]
 }
 
 model Roles {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  email     String    @unique
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
   password  String
   role      RoleType
   subjects  Subject[]
   firstName String
   lastName  String?
   phone     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   Enroll    Enroll[]
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+  branchId  String?  @db.ObjectId
 }
 
 model Batch {
@@ -67,14 +71,15 @@ model Student {
   email      String       @unique
   Firstname  String
   lastname   String
-  avatar     String // Removed @unique if multiple students can have the same avatar
+  avatar     String
   password   String
   rollNumber String
   batch      Batch?       @relation(fields: [batchId], references: [id], name: "BatchToStudent")
   batchId    String?      @db.ObjectId
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  role       RoleType // If referencing `Roles`, it should be a relation instead
+  role       RoleType
+  // Removed the enum field 'role' from Student to avoid duplication.
   Enroll     Enroll[]
   Attendance Attendance[]
   phone      String?
@@ -86,7 +91,7 @@ model Enroll {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   student   Student  @relation(fields: [studentId], references: [id])
   studentId String   @db.ObjectId
-  teacher   Roles    @relation(fields: [teacherId], references: [id])
+  teacher   Roles     @relation(fields: [teacherId], references: [id])
   teacherId String   @db.ObjectId
   subject   Subject  @relation(fields: [subjectId], references: [id])
   subjectId String   @db.ObjectId

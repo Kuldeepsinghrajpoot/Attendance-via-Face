@@ -7,7 +7,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const id = req.nextUrl.searchParams.get("id") ?? "";
     if (!id) {
         return NextResponse.json(
-            new ApiError(401, "ID not found", "ID not found")
+            new ApiError(401, "user not authorized", "user not authorized")
         );
     }
 

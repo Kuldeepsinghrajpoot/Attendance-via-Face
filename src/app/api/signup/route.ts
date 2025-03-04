@@ -22,6 +22,7 @@ export async function POST(request: NextResponse, response: NextResponse) {
         avatar: formData.get("avatar") as File,
     };
     const {Firstname,lastname,rollNumber,email,password,batch,avatar,branch} = userData;
+    console.log({Firstname,lastname,rollNumber,email,password,batch,avatar,branch})
 
     try {
         // Validation
@@ -45,6 +46,9 @@ export async function POST(request: NextResponse, response: NextResponse) {
                 id: true
             }
         })
+        if (!batchData) {
+            return NextResponse.json(new ApiError(404, "Batch not found", "Batch not found"));
+        }
         const branchData = await prisma.branch.findUnique({
             where: {
                 branchName: branch
@@ -53,6 +57,10 @@ export async function POST(request: NextResponse, response: NextResponse) {
                 id: true
             }
         })
+        if (!branchData) {
+            return NextResponse.json(new ApiError(404, "Branch not found", "Branch not found"));
+            
+        }
         // Insert user data into the database
         const res = await prisma.student.create({
             data: {

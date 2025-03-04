@@ -18,24 +18,31 @@ export const authOptions: NextAuthOptions = {
                         password: string;
                     };
                     // Query the database to find a user with the provided email
-                    const user: any = await prisma.student.findUnique({
-                        where: {
-                            email: email,
-                        },
-                    });
-
-                    if (!user || user === null) {
+                    const [student, roles] = await Promise.all([
+                        prisma.student.findUnique({
+                            where: {
+                                email,
+                            },
+                        }),
+                        prisma.roles.findUnique({
+                            where: {
+                                email,
+                            },
+                        }),
+                    ]);
+                    if (!student && !roles) {
                         // If user not found, return null
                         return null;
                     }
+                    const user = student ?? roles;
 
                     // If user found, check if passwords match
-                    if (user.password === password) {
+                    if (user?.password === password) {
                         return {
                             id: user.id.toString(),
                             email: user.email,
                             role: user.role ?? "STUDENT",
-                            Firstname: user.Firstname,
+                            Firstname: user.Firstname ?? user.firstName,
                             rollNumber: user.rollNumber,
                             avatar: user.avatar,
                         }; // Return user object if password matches

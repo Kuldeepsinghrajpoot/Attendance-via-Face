@@ -1,40 +1,9 @@
 import Link from "next/link";
-import { auth } from "@/app/api/auth";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import axios from "axios";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-// Function to fetch the user data that includes enrollment details
-async function fetchUserEnrollments({ id }: { id: string }) {
-  try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_PORT}/api/teacher?id=${id}`,
-      { timeout: 5000 }
-    );
-    return res.data; // Expecting JSON structure as provided
-  } catch (error) {
-    console.error("Error fetching enrollment data:", error);
-    return { data: { getUser: [] } };
-  }
-}
-
-export default async function EnrollTable() {
-  // Get the user data (adjust the endpoint as needed)
-  const res = await auth();
-  const id = res?.role.id;
-  const response = await fetchUserEnrollments({ id });
-
-  // Assuming you want to display enrollments of the first user in getUser array
-  const user = response?.data?.getUser?.[0];
-  const enrollments = user?.Enroll || [];
-
-  const groupedEnrollments = enrollments.reduce((acc: any, enroll: any) => {
+export default function EnrollTable({ id }: { id: any[] }) {
+  // Group enrollments by subject and batch
+  const groupedEnrollments = id.reduce((acc: any, enroll: any) => {
     const key = `${enroll.subject.id}-${enroll.batch.id}`;
     if (!acc[key]) {
       acc[key] = { 
@@ -62,7 +31,7 @@ export default async function EnrollTable() {
           <TableHead className="text-left font-semibold">Year</TableHead>
           <TableHead className="text-left font-semibold">Batch</TableHead>
           <TableHead className="text-left font-semibold">Total Students</TableHead>
-          <TableHead className="text-left font-semibold">Details</TableHead>
+          {/* <TableHead className="text-left font-semibold">Details</TableHead> */}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -75,12 +44,12 @@ export default async function EnrollTable() {
               <TableCell className="py-2">{enroll.batch}</TableCell>
               <TableCell className="py-2">{enroll.count}</TableCell>
               <TableCell className="py-2">
-                <Link
+                {/* <Link
                   href={`/dashboard/enroll-student/${enroll.subjectId}/${enroll.session}/${enroll.year}/${enroll.batchId}`}
                   className="text-blue-500 hover:underline"
                 >
                   View Students
-                </Link>
+                </Link> */}
               </TableCell>
             </TableRow>
           ))

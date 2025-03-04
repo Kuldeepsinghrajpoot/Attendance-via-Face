@@ -19,8 +19,9 @@ async function getData({ id }: { id: string }) {
 
 async function page() {
     const response = await auth();
-    const id = response?.role;
+    const id = response?.role?.id;
     const res = await getData({ id });
+    console.log(id)
 
     return (
         <section className=" p-4 rounded-md  shadow-sm">

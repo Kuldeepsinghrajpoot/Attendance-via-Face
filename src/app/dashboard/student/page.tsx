@@ -1,4 +1,4 @@
-"use catch"
+"use catch";
 import { Student } from "./table";
 import fetchStudent from "./fetchStudent";
 import { StudentForm } from "./student-form";
@@ -8,12 +8,11 @@ export default async function page() {
     return (
         <>
             <div>
-               <StudentForm/>
+                <StudentForm />
             </div>
             <div className="bg-background p-4  rounded-md border">
-                <Student response={response.users} />
+                <Student response={response.data} />
             </div>
         </>
-    )
-
+    );
 }

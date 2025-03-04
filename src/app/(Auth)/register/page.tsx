@@ -143,7 +143,7 @@ export default function Register() {
                   {errors.avatar && <p className="text-red-500 text-xs">{errors.avatar.message}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="branch">Profile Picture</Label>
+                  <Label htmlFor="branch">Branch</Label>
                   <Input type="text" id="branch" {...register('branch')} className="cursor-pointer" />
                   {errors.branch && <p className="text-red-500 text-xs">{errors.branch.message}</p>}
                 </div>

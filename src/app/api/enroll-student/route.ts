@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
             })),
         });
         if (enrollments) {
-            console.log("No enrollments created.");
+            console.log("No enrolls created.");
             return NextResponse.json(
                 new ApiResponse({
                     status: 200,
@@ -57,8 +57,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
             new ApiError(
                 404,
-                "No enrollments created",
-                "No enrollments created"
+                "No enrolls created",
+                "No enrolls created"
             )
         );
     } catch (error) {
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 }
 
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest):Promise<Response> {
     const studentId = req.nextUrl.searchParams.get("id") ?? "";
     
     if (!studentId) {
@@ -78,28 +78,30 @@ export async function GET(req: NextRequest) {
 
     try {
         // Fetch all enrollments where the student is enrolled
-        const enrollments = await prisma.enroll.findMany({
-            where: { studentId },
+        const enrolls = await prisma.enroll.findMany({
+            where: { studentId,
+             },
             include: {
-                subject: { select: { subjectName: true } }, 
-                teacher: { select: { id: true, firstName: true, lastName: true } }
+                student: {  },
+                subject: {  }, 
+                teacher: {  }
             }
         });
 
-        if (enrollments.length === 0) {
-            return NextResponse.json(new ApiError(404, "No enrollments found", "No enrollments found"));
+        if (enrolls.length === 0) {
+            return NextResponse.json(new ApiError(404, "No enroll found", "No enrollments found"));
         }
 
         return NextResponse.json(
             new ApiResponse({
                 status: 200,
-                data: enrollments,
-                message: "Student enrollments retrieved successfully"
+                data: enrolls,
+                message: "Student enrolls retrieved successfully"
             })
         );
 
     } catch (error) {
-        console.error("Error fetching enrollments:", error);
+        console.error("Error fetching enrolls:", error);
         return NextResponse.json(new ApiError(500, "Internal Server Error"));
     } finally {
         await prisma.$disconnect();
