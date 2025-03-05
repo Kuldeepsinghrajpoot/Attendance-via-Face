@@ -15,11 +15,13 @@ async function AttendaceRecord({searchParams}:any) {
     const {date} = await searchParams;
     try {
         const response = await fetchData( date);
+    
+         
         // console.log(response);
         return (
             <div className='px-7 shadow-sm bg-background/80 rounded-md p-4 my-4 '>
                 <DatePickerDemo />
-                <Record Attendance={response?.response} count={response?.presentStudentsCount} totalStudent={response?.totalstudent} />
+                <Record data={response} date={date} />
             </div>
         );
     } catch (error) {

@@ -1,17 +1,13 @@
 import React from 'react'
-import { Subject } from './table'
-import { SubjectForm } from './subject-form'
-import { SelectSubject } from './select-subject'
+import { AttendanceSchedule } from './table'
+
 
 function page() {
   return (
-    <section className=' p-4 rounded-md  shadow-sm'>
-      <div className='flex justify-start gap-2 h-12 max-h-min'>
-        <SubjectForm/>
-        <SelectSubject/>
-      </div>
+    <section className=' p-4 '>
+     
       <div className='bg-background border rounded-md p-4 my-4'>
-        <Subject/>
+        <AttendanceSchedule/>
       </div>
     </section>
   )

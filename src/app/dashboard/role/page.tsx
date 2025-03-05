@@ -27,6 +27,7 @@ async function page() {
         <section className=" p-4 rounded-md  shadow-sm">
             <div className="flex justify-start gap-2 h-12 max-h-min">
                 <RoleForm />
+                {id}
                 {/* <SelectSubject/> */}
               
             </div>

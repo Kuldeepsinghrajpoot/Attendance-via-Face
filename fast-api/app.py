@@ -104,6 +104,7 @@ async def send_attendance(student_id):
     print(f"Sending attendance for student ID: {student_id}")
     try:
         response = requests.post("http://localhost:3000/api/attendance", json={"avatar": student_id})
+        print(response.json())
         response.raise_for_status()
         print("Attendance successfully sent:", response.json())
     except requests.exceptions.RequestException as e:

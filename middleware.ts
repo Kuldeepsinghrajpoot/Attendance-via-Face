@@ -1,39 +1,31 @@
-import withAuth from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default withAuth(
-    function middleware(){
+export async function middleware(req: any) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const { pathname } = req.nextUrl;
+
+    // Allow public routes (e.g., login, register)
+    if (pathname.startsWith("/") || pathname.startsWith("/register")) {
         return NextResponse.next();
-    },
-
-    {
-        callbacks:{
-            authorized:({token,req})=>{
-                const {pathname} = req.nextUrl;
-
-                // allow dashboard;
-
-                if (pathname.startsWith('api/student')) {
-                    return true;
-                }
-                // allow auth-related routes;
-
-                if (pathname.startsWith("/api/auth")||pathname==="/login"||pathname=="register") {
-                    return true;
-                }
-
-                if(pathname==="/" || pathname.startsWith("/api/student")||pathname.startsWith("/student")){
-                    return true;
-                }
-                return !!token;
-            },
-        },
     }
-);
+
+    // If user is not authenticated, redirect to login
+    if (!token) {
+        return NextResponse.redirect(new URL("/", req.url));
+    }
+    // Role-based access control (Example: Only admin can access "/dashboard/role")
+    if (
+        pathname.startsWith("/dashboard/role") &&
+        pathname.startsWith("/dashboard/student") &&
+        token.role !== "ADMIN"
+    ) {
+        return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    return NextResponse.next();
+}
 
 export const config = {
-    matcher:[
-        "/((?!_next/static!_next/image|image|favicon.icon|public/).*)",
-        "/dashboard"
-    ]
-}
+    matcher: ["/dashboard/:path*"], // Protect all dashboard routes
+};

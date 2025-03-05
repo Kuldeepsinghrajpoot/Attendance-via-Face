@@ -93,9 +93,32 @@ export async function GET(req: NextRequest) {
                             },
                             subject: {
                                 select: { id: true, subjectName: true },
+                                
+                            },
+                            
+                        },
+                  },
+                  subjects:{
+                        select:{
+                            id:true,
+                            subjectName:true,
+                           
+                            branch:{
+                                select:{
+                                    id:true,
+                                    branchName:true,
+                                }
+                            },
+                            scheduleAttendance: {
+                                select: {
+                                   id: true,
+                                   startTime: true,
+                                   endTime: true,
+                                }
                             },
                         },
                   }
+                  
               },
           }),
           prisma.roles.count({

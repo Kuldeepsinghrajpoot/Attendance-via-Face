@@ -49,8 +49,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                                 },
                                 scheduleAttendance: {
                                     select: {
-                                        fromTo: true,
-                                        upTo: true,
+                                       id: true,
+                                       startTime: true,
+                                       endTime: true,
                                     }
                                 },
                             },
@@ -84,7 +85,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         }
     } catch (error) {
         return NextResponse.json(
-            new ApiError(500, "Error fetching users", "Error fetching users")
+            new ApiError(500, "Error fetching users", error)
         );
     } finally {
         await prisma.$disconnect();

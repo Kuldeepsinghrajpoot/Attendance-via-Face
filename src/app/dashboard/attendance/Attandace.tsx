@@ -1,4 +1,5 @@
-import { auth } from "@/app/api/auth";
+'use client'
+
 import {
     Table,
     TableBody,
@@ -7,71 +8,121 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import axios from "axios";
-import { CalendarIcon } from "lucide-react";
+import FaceVerify from "./face";
 
-async function fetchData({ id }: { id: string }) {
-    try {
-        const response = await axios.get(
-            `${process.env.NEXTAUTH_URL}/api/attendance?id=${id}`
-        );
-        return response.data;
-    } catch (error) {
-        return "something went wrong";
-    }
+interface Teacher {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
 }
-export default async function TableDemo() {
-    const authResponse = await auth();
-    const id = authResponse?.id;
-    const information = await fetchData({ id });
-    function getDates(dateString: any): string {
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.getMonth() + 1; // Months are zero-based, so add 1
-        const year = date.getFullYear();
-        const getdate = day + "/" + month + "/" + year;
-        // console.log(dateString,'------>', getdate)
-        return getdate;
+
+interface ScheduleAttendance {
+    id: string;
+    startTime: string;
+    endTime: string;
+}
+
+interface Subject {
+    id: string;
+    subjectName: string;
+    branch: string | null;
+    teacher: Teacher;
+    scheduleAttendance: ScheduleAttendance;
+    attendance: boolean | null;
+}
+
+interface Batch {
+    id: string;
+    batch: string;
+}
+
+interface Enroll {
+    session: string;
+    year: string;
+    batch: Batch;
+    subject: Subject;
+    teacher: Teacher;
+}
+
+interface StudentData {
+    id: string;
+    email: string;
+    Firstname: string;
+    lastname: string;
+    avatar: string;
+    password: string;
+    rollNumber: string;
+    batchId: string;
+    createdAt: string;
+    updatedAt: string;
+    role: string;
+    phone: string | null;
+    branchId: string | null;
+    Enroll: Enroll[];
+    Attendance: any[]; // Define if necessary
+}
+
+interface AttendanceTableProps {
+    data: StudentData[];
+}
+
+// Function to format date and time
+const formatDateTime = (dateTime: string) => {
+    const date = new Date(dateTime);
+    const formattedDate = date.toLocaleDateString("en-GB"); // Format: DD/MM/YYYY
+    const formattedTime = date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    }); // Format: HH:MM:SS
+    return { date: formattedDate, time: formattedTime };
+};
+
+export default function AttendanceTable({ data }: AttendanceTableProps) {
+    if (!data || data.length === 0 || !data[0].Enroll || data[0].Enroll.length === 0) {
+        return <p>No attendance data available.</p>;
     }
 
     return (
-        <div className="md:flex md:justify-start gap-24   ">
-            <div className="w-full  dark:bg-background rounded-md px-6 py-5  ">
-                <div className=" items-center object-center flex justify-start">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    <div> {getDates(new Date())}</div>
-                </div>
+        <div className="md:flex md:justify-start gap-24">
+            <div className="w-full dark:bg-background rounded-md px-6 py-5">
                 <Table className="bg-inherit">
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Roll Number</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead className=" text-right">
-                                Attandance
-                            </TableHead>
+                            <TableHead>Session</TableHead>
+                            <TableHead>Year</TableHead>
+                            <TableHead>Batch</TableHead>
+                            <TableHead>Subject</TableHead>
+                            <TableHead>Schedule Date</TableHead>
+                            <TableHead>Start Time</TableHead>
+                            <TableHead>End Time</TableHead>
+                            <TableHead>Attendance Status</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {information?.data?.map((item: any, id: number) => {
+                        {data[0].Enroll.map((enroll, index) => {
+                            if (!enroll.subject || !enroll.subject.scheduleAttendance) return null;
+
+                            const { session, year, batch, subject } = enroll;
+                            const { scheduleAttendance } = subject;
+                            const formattedStart = formatDateTime(scheduleAttendance.startTime);
+                            const formattedEnd = formatDateTime(scheduleAttendance.endTime);
+
                             return (
-                                <TableRow key={id + 1}>
-                                    <TableCell> {item?.rollNumber}</TableCell>
-                                    <TableCell className=" uppercase">
-                                        {" "}
-                                        {item?.Firstname}
+                                <TableRow key={index}>
+                                    <TableCell>{session}</TableCell>
+                                    <TableCell>{year}</TableCell>
+                                    <TableCell>{batch.batch}</TableCell>
+                                    <TableCell>{subject.subjectName}</TableCell>
+                                    <TableCell>{formattedStart.date}</TableCell>
+                                    <TableCell>{formattedStart.time}</TableCell>
+                                    <TableCell>{formattedEnd.time}</TableCell>
+                                    <TableCell className="text-right">
+                                    <button onClick={()=>alert("asdf") }>onClick</button>
+                                       
                                     </TableCell>
-                                    {item?.attendances?.map(
-                                        (item: any, key: any) => {
-                                            return (
-                                                <TableCell
-                                                    className=" uppercase text-right"
-                                                    key={item.id}
-                                                >
-                                                    {item.attendancevalue}
-                                                </TableCell>
-                                            );
-                                        }
-                                    )}
                                 </TableRow>
                             );
                         })}
