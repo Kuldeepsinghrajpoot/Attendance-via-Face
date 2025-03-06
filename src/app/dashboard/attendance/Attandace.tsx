@@ -9,6 +9,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import FaceVerify from "./face";
+import CameraCapture from "./capture";
 
 interface Teacher {
     id: string;
@@ -120,8 +121,17 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
                                     <TableCell>{formattedStart.time}</TableCell>
                                     <TableCell>{formattedEnd.time}</TableCell>
                                     <TableCell className="text-right">
-                                    <button onClick={()=>alert("asdf") }>onClick</button>
+
+                                    {/* <button onClick={()=>alert("asdf") }>onClick</button> */}
                                        
+                                       <CameraCapture attendanceData={
+                                             {   subjectId:subject.subjectName,
+                                                  scheduleId: scheduleAttendance.id,
+                                                  date: formattedStart.date,
+                                                  time: formattedStart.time,
+                                             }
+                                       }/>
+                                       {/* <Mark/> */}
                                     </TableCell>
                                 </TableRow>
                             );

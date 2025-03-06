@@ -16,7 +16,7 @@ export default withAuth(
                 
                 // allow dashboard;
               
-                if (pathname.startsWith('api/student')) {
+                if (pathname.startsWith('/api/')) {
                     return true;
                 }
                 // allow auth-related routes;
@@ -25,7 +25,7 @@ export default withAuth(
                     return true;
                 }
 
-                if(pathname==="/" || pathname.startsWith("/api/student")||pathname.startsWith("/student")){
+                if(pathname==="/" || pathname.startsWith("/api/")||pathname.startsWith("/student")){
                     return true;
                 }
 
@@ -38,6 +38,6 @@ export default withAuth(
 export const config = {
     matcher:[
         // "/((?!_next/static!_next/image|image|favicon.icon|public/).*)",
-        "/dashboard/:path*",
+        "/dashboard/:path*"
     ]
 }

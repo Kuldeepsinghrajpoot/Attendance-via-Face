@@ -1,5 +1,5 @@
 import { Attendance, PrismaClient, Student } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ApiResponse } from "../api-response";
 import { ApiError } from "../api-error";
 
@@ -33,11 +33,14 @@ async function getAttendanceForDate(
     return attendance;
 }
 
-export async function POST(request: Request): Promise<Response> {
+export async function POST(req: NextRequest): Promise<Response> {
+    const id = req.nextUrl.searchParams.get("id");
+    console.log(id);
+    if (!id) {
+        return NextResponse.json(new ApiError(400, "Bad Request", "ID not provided"));
+    }
     try {
-        const { avatar }: StudentRequest = await request.json();
-        console.log("avatar", avatar);
-        // console.log(avatar)
+        const { avatar, subjectId, scheduleId } = await req.json();
         if (!avatar) {
             return new Response(
                 JSON.stringify({ status: 400, error: "Avatar not provided" }),
@@ -46,13 +49,15 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         const user: Student | null = await prisma.student.findFirst({
-            where: { avatar: `${avatar}.jpeg` },
+            where: {
+                avatar: `${avatar}.jpeg`,
+                id
+            },
         });
 
         if (!user) {
-            return new Response(
-                JSON.stringify({ status: 404, error: "User not found" }),
-                { status: 404 }
+            return NextResponse.json(
+                new ApiError(404, "Not Found", "Student not found") 
             );
         }
 

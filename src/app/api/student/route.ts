@@ -15,6 +15,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const users = await prisma.student.findMany({
             where: {
                 role: "STUDENT",
+                id
             },
             select: {
                 Firstname: true,
@@ -49,9 +50,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                                 },
                                 scheduleAttendance: {
                                     select: {
-                                       id: true,
-                                       startTime: true,
-                                       endTime: true,
+                                        id: true,
+                                        startTime: true,
+                                        endTime: true,
                                     }
                                 },
                             },
