@@ -17,7 +17,8 @@ const page = async () => {
   const id = await auth();
   const response = await fetchData(id);
 
-  // console.log(response)
+
+
 
   return (
     // <Box/>

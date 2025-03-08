@@ -39,6 +39,7 @@ export function DateTimePicker24hForm({
 }: {
     initialValues: any;
 }) {
+    
     const form = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -61,14 +62,14 @@ export function DateTimePicker24hForm({
             ...data, // Include form values (startTime, endTime)
             duration,
         };
-console.log(requestData);
+        console.log(requestData);
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_PORT}/api/schedule-attendance?id=${id}`,
                 requestData,
                 { timeout: 5000 }
             );
-
+            console.log(res);
             if (res?.data?.status !== 200) {
                 toast.error("Error while scheduling attendance.");
                 return 0;
@@ -79,7 +80,9 @@ console.log(requestData);
                     "PPPP HH:mm"
                 )}, Duration: ${duration} minutes`
             );
-        } catch (error) { }
+        } catch (error) {
+            toast.error("Error while scheduling attendance.");
+        }
     };
 
     function handleDateSelect(
@@ -111,7 +114,7 @@ console.log(requestData);
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="space-x-1" variant="ghost">
+                <Button className="" variant="ghost">
                     <Timer />
                 </Button>
             </DialogTrigger>

@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await req.json();
-        const { email, role, password, firstName, phone, lastName } = data?.values;
+        const { email, role, password, firstName, phone, lastName } =
+            data?.values;
 
         console.log(data);
 
@@ -64,81 +65,44 @@ export async function POST(req: NextRequest) {
 
 // GET roles
 export async function GET(req: NextRequest) {
-  try {
-      const id = new URL(req.url).searchParams.get("id");
+    try {
+        const id = new URL(req.url).searchParams.get("id");
 
-      if (!id) {
-          return NextResponse.json(
-              new ApiError(403, "You are not authorized")
-          );
-      }
+        if (!id) {
+            return NextResponse.json(
+                new ApiError(403, "You are not authorized")
+            );
+        }
 
-      const [getUser, teacherCount, adminCount] = await Promise.all([
-          prisma.roles.findMany({
-              select: {
-                  id: true,
-                  firstName: true,
-                  lastName: true,
-                  email: true,
-                  role: true,
-                  phone: true,
-                
-                  Enroll: {
-                        select: {
-                            id: true,
-                            session: true,
-                            year: true,
-                            batch: {
-                                select: { id: true, batch: true },
-                            },
-                            subject: {
-                                select: { id: true, subjectName: true },
-                                
-                            },
-                            
-                        },
-                  },
-                  subjects:{
-                        select:{
-                            id:true,
-                            subjectName:true,
-                           
-                            branch:{
-                                select:{
-                                    id:true,
-                                    branchName:true,
-                                }
-                            },
-                            scheduleAttendance: {
-                                select: {
-                                   id: true,
-                                   startTime: true,
-                                   endTime: true,
-                                }
-                            },
-                        },
-                  }
-                  
-              },
-          }),
-          prisma.roles.count({
-              where: { role: "TEACHER" },
-          }),
-          prisma.roles.count({
-              where: { role: "ADMIN" },
-          }),
-      ]);
+        const [getUser, teacherCount, adminCount] = await Promise.all([
+            prisma.roles.findMany({
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    role: true,
+                    phone: true,
+                },
+            }),
+            prisma.roles.count({
+                where: { role: "TEACHER" },
+            }),
+            prisma.roles.count({
+                where: { role: "ADMIN" },
+            }),
+        ]);
 
-      return NextResponse.json(
-          new ApiResponse({
-              status: 200,
-              data: { getUser, teacherCount, adminCount },
-              message: "Fetched successfully",
-          })
-      );
-  } catch (error) {
-      return NextResponse.json(new ApiError(401, "Unauthorized user", error));
-  } finally {
-      await prisma.$disconnect();
-  }
+        return NextResponse.json(
+            new ApiResponse({
+                status: 200,
+                data: { getUser, teacherCount, adminCount },
+                message: "Fetched successfully",
+            })
+        );
+    } catch (error) {
+        return NextResponse.json(new ApiError(401, "Unauthorized user", error));
+    } finally {
+        await prisma.$disconnect();
+    }
 }

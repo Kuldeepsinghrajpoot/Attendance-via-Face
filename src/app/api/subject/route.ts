@@ -15,13 +15,26 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { subject }: Subject = await req.json();
+        const { subject } = await req.json();
         if ([subject].some((e) => !e)) {
             return NextResponse.json(
                 new ApiError(402, "Invalid details", "Invalid Details")
             );
         }
+       
         // Update teacher with new subject
+        const duplicate = await prisma.subject.findFirst({
+            where: {
+                subjectName: subject,
+            },
+        })
+
+        if (duplicate) {
+            return NextResponse.json(
+                new ApiError(403, "Subject already exists", "Subject already exists")
+            );
+        }
+
         const response = await prisma.subject.create({
             data: {
                 subjectName: subject,

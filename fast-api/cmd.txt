@@ -1,1 +1,138 @@
-pip install -r requirements.txt
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Attendance {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  student         Student         @relation(fields: [studentId], references: [id])
+  teacher         Roles?          @relation(fields: [RoleId], references: [id])
+  studentId       String          @db.ObjectId
+  RoleId          String?         @db.ObjectId
+  attendancevalue AttendanceValue
+  subject         Subject[]
+  Enroll          Enroll[]
+}
+
+model Branch {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  subjects   Subject[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  branchName String    @unique
+  students   Student[]
+  Roles      Roles[]
+}
+
+model Subject {
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName          String
+  branch               Branch?             @relation(fields: [branchId], references: [id])
+  branchId             String?             @db.ObjectId
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  teacher              Roles?              @relation(fields: [teacherId], references: [id]) // Optional relation if needed.
+  teacherId            String?             @db.ObjectId
+  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  scheduleAttendanceId String?             @db.ObjectId
+  attendance           Attendance?         @relation(fields: [AttendanceId], references: [id])
+  AttendanceId         String?             @db.ObjectId
+  Enroll               Enroll[]
+}
+
+model Roles {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  email      String       @unique
+  password   String
+  role       RoleType
+  subjects   Subject[]
+  firstName  String
+  lastName   String?
+  phone      String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Enroll     Enroll[]
+  branch     Branch?      @relation(fields: [branchId], references: [id])
+  branchId   String?      @db.ObjectId
+  Attendance Attendance[]
+}
+
+model Batch {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  batch     String    @unique // Example: "A", "B", "C"
+  students  Student[] @relation("BatchToStudent")
+  Enroll    Enroll[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  email      String       @unique
+  Firstname  String
+  lastname   String
+  avatar     String
+  password   String
+  rollNumber String
+  batch      Batch?       @relation(fields: [batchId], references: [id], name: "BatchToStudent")
+  batchId    String?      @db.ObjectId
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  role       RoleType
+  Enroll     Enroll[]
+  Attendance Attendance[]
+  phone      String?
+  branch     Branch?      @relation(fields: [branchId], references: [id])
+  branchId   String?      @db.ObjectId
+}
+
+model Enroll {
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  student              Student             @relation(fields: [studentId], references: [id])
+  studentId            String              @db.ObjectId
+  teacher              Roles               @relation(fields: [teacherId], references: [id])
+  teacherId            String              @db.ObjectId
+  subject              Subject             @relation(fields: [subjectId], references: [id])
+  subjectId            String              @db.ObjectId
+  batch                Batch               @relation(fields: [batchId], references: [id])
+  batchId              String              @db.ObjectId
+  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  scheduleAttendanceId String?             @db.ObjectId
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  session              String
+  year                 String
+  Attendance           Attendance?         @relation(fields: [attendanceId], references: [id])
+  attendanceId         String?             @db.ObjectId
+}
+
+model ScheduleAttendance {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  subjects  Subject[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  startTime DateTime?
+  endTime   DateTime?
+  subjectId String?   @db.ObjectId
+  branchId  String?   @db.ObjectId
+  Enroll Enroll[]
+}
+
+enum RoleType {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum AttendanceValue {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}

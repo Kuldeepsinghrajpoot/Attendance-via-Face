@@ -1,52 +1,43 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { User2 } from "lucide-react";
 import Swal from "sweetalert2";
 import {
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import React, { useEffect, useState } from "react";
-import { roleSchema, RoleSchema } from "@/schema/role-schema";
+import React, { useState } from "react";
 import axios from "axios";
-
+import { EnrollSchema, enrollSchema } from "@/schema/enroll-student";
 
 export function SubjectForm() {
     const { data: session, status } = useSession();
-    console.log(session?.user?.id)
+    console.log(session?.user?.id);
     const [dialogOpen, setDialogOpen] = useState(false);
 
     // Redirect to dashboard if user is logged in
 
-    const form = useForm<RoleSchema>({
-        resolver: zodResolver(roleSchema),
-        defaultValues: {
-            email: "", role: "", password: "", firstName: "", phone: "", lastName: ""
-        },
+    const form = useForm<EnrollSchema>({
+        resolver: zodResolver(enrollSchema),
+        defaultValues: {},
     });
 
-    const onSubmit: SubmitHandler<RoleSchema> = React.useCallback(
+    const onSubmit: SubmitHandler<EnrollSchema> = React.useCallback(
         async (values) => {
             console.log(values);
             Swal.fire({
@@ -69,7 +60,7 @@ export function SubjectForm() {
                         },
                     }
                 );
-                console.log(res)
+                console.log(res);
                 Swal.close();
                 const response = res;
                 if (response?.data?.status === 200) {
@@ -117,114 +108,112 @@ export function SubjectForm() {
             <DialogTrigger asChild>
                 <Button className="space-x-1" variant="secondary">
                     <User2 />
-                    <span>Add Role</span>
+                    <span>Enroll Student</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[625px]">
                 <DialogHeader>
                     <DialogTitle className="text-center text-xl font-semibold">
-                        Add new Role
+                        Enroll Student
                     </DialogTitle>
-                    <DialogDescription className="text-center text-gray-500">
-                        Signup in to new account to continue.
-                    </DialogDescription>
                 </DialogHeader>
                 <FormProvider {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="">
                         <div className="grid gap-4 grid-cols-2 py-4">
                             <FormField
                                 control={form.control}
-                                name="email"
+                                name="subjectId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Subject</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
+                                            <Input
+                                                placeholder="Subject"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
+
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <FormField
                                 control={form.control}
-                                name="firstName"
+                                name="branchId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Branch</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
+                                            <Input
+                                                placeholder="Branch"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
+
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <FormField
                                 control={form.control}
-                                name="lastName"
+                                name="session"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Session</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
+                                            <Input
+                                                placeholder="Session"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
+
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <FormField
                                 control={form.control}
-                                name="phone"
+                                name="year"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Student Year</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
+                                            <Input
+                                                placeholder=" Student Year"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
+
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <FormField
                                 control={form.control}
-                                name="role"
+                                name="batchId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username</FormLabel>
+                                        <FormLabel>Batch</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
+                                            <Input
+                                                placeholder="Batch"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
+
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
 
-                        <DialogFooter className="w-full ">
+                        <DialogFooter>
                             <Button
                                 type="submit"
                                 className="w-full"
                                 variant="default"
                             >
-                                Login
+                                Enroll Student
                             </Button>
                         </DialogFooter>
                     </form>

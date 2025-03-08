@@ -80,7 +80,7 @@ export default function Dashboard({ children }: { children: any }) {
     );
     // Filter navigation items based on the user's role
     const filteredNavItems =
-        user?.role?.role === "ADMIN"
+        user?.role?.role === "STUDENT"
             ? navItems.filter((item) =>
                   ["Dashboard", "Settings", "Mark Attendance"].includes(
                       item.name
@@ -226,7 +226,7 @@ export default function Dashboard({ children }: { children: any }) {
 
                     {/* User Info & Dropdown */}
                     <div className="w-full">
-                        Hi {session?.user?.Firstname || session?.user?.name}
+                        Hi {session?.user?.Firstname || session?.user?.name} {session?.user?.role?.role}
                     </div>
 
                     <DropdownMenu>

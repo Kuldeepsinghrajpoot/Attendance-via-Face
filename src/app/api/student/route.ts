@@ -15,7 +15,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const users = await prisma.student.findMany({
             where: {
                 role: "STUDENT",
-                id
             },
             select: {
                 Firstname: true,
@@ -23,50 +22,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                 email: true,
                 phone: true,
                 rollNumber: true,
-                batch: {
-                    select: {
-                        id: true,
-                        batch: true,
-                    },
-                },
-                branch: {
-                    select: {
-                        id: true,
-                        branchName: true,
-                    },
-                },
-                Enroll: {
-                    select: {
-                        subject: {
-                            select: {
-                                id: true,
-                                subjectName: true,
-                                branch: {
-                                    select: {
-                                        id: true,
-                                        branchName: true,
-
-                                    },
-                                },
-                                scheduleAttendance: {
-                                    select: {
-                                        id: true,
-                                        startTime: true,
-                                        endTime: true,
-                                    }
-                                },
-                            },
-                        },
-                        teacher: {
-                            select: {
-                                firstName: true,
-                                lastName: true,
-                                id: true,
-                            },
-                        },
-
-                    },
-                },
             },
 
         });

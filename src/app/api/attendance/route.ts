@@ -8,25 +8,29 @@ interface StudentRequest {
     avatar: string;
 }
 
+// Helper: Get attendance record for a student for a specific subject on a given date.
 async function getAttendanceForDate(
-    studentId: any,
+    studentId: string,
+    subjectId: string,
     date: Date
 ): Promise<Attendance | null> {
-    console.log(studentId);
+    const startOfDay = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+    const endOfDay = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + 1
+    );
     const attendance = await prisma.attendance.findFirst({
         where: {
             studentId,
+            subjectId, // Check that attendance record matches the subject
             createdAt: {
-                gte: new Date(
-                    date.getFullYear(),
-                    date.getMonth(),
-                    date.getDate()
-                ),
-                lt: new Date(
-                    date.getFullYear(),
-                    date.getMonth(),
-                    date.getDate() + 1
-                ),
+                gte: startOfDay,
+                lt: endOfDay,
             },
         },
     });
@@ -35,9 +39,10 @@ async function getAttendanceForDate(
 
 export async function POST(req: NextRequest): Promise<Response> {
     const id = req.nextUrl.searchParams.get("id");
-    console.log(id);
     if (!id) {
-        return NextResponse.json(new ApiError(400, "Bad Request", "ID not provided"));
+        return NextResponse.json(
+            new ApiError(400, "Bad Request", "ID not provided")
+        );
     }
     try {
         const { avatar, subjectId, scheduleId } = await req.json();
@@ -51,32 +56,40 @@ export async function POST(req: NextRequest): Promise<Response> {
         const user: Student | null = await prisma.student.findFirst({
             where: {
                 avatar: `${avatar}.jpeg`,
-                id
+                id,
             },
         });
 
         if (!user) {
             return NextResponse.json(
-                new ApiError(404, "Not Found", "Student not found") 
+                new ApiError(404, "Not Found", "Student not found")
             );
         }
 
-        // Check if user has already been marked PRESENT for today's date
+        // Check if the student has already been marked PRESENT for this subject today.
         const today = new Date();
-        const attendanceForToday = await getAttendanceForDate(user.id, today);
+        const attendanceForToday = await getAttendanceForDate(
+            user.id,
+            subjectId,
+            today
+        );
 
         if (attendanceForToday) {
             return new Response(
-                JSON.stringify({ message: "Already PRESENT", id: user.id })
+                JSON.stringify({
+                    message: "Already PRESENT for this subject",
+                    id: user.id,
+                })
             );
         }
 
-        // If user has not been marked PRESENT for today's date, create a new attendance record
+        // Create new attendance record for this subject.
         await prisma.attendance.create({
             data: {
                 studentId: user.id,
-
-                attendancevalue: "PRESENT",
+                subjectId: subjectId,
+                status: "PRESENT",
+                ...(scheduleId && { scheduleId }),
             },
         });
 
@@ -91,7 +104,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 }
 
-export async function GET(): Promise<Response> {
+export async function GET(req: NextRequest): Promise<Response> {
+    // const id = req.nextUrl.searchParams.get("id");
+    // if (!id)
+    // return NextResponse.json(
+    //     new ApiError(400, "Bad Request", "ID not provided")
+    // );
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     try {
@@ -99,7 +117,7 @@ export async function GET(): Promise<Response> {
             include: {
                 Attendance: {
                     where: {
-                        attendancevalue: "PRESENT",
+                        status: "PRESENT",
 
                         createdAt: {
                             gte: currentDate, // Get attendance records from the current date onwards
@@ -111,6 +129,7 @@ export async function GET(): Promise<Response> {
             },
             where: {
                 role: "STUDENT",
+                // id,
             },
         });
         return NextResponse.json(

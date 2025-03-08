@@ -19,8 +19,7 @@ export async function GET(request: NextRequest): Promise<Response> {
             include: {
                 Attendance: {
                     where: {
-                        attendancevalue: "PRESENT",
-
+                        status: "PRESENT",
                         createdAt: {
                             gte: new Date(
                                 currentDate.getFullYear(),
@@ -35,6 +34,7 @@ export async function GET(request: NextRequest): Promise<Response> {
                         },
                     },
                 },
+
             },
             where: {
                 role: "STUDENT",
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest): Promise<Response> {
         // Get the count of students who have attended on the current date
         const presentStudentsCount = await prisma.attendance.count({
             where: {
-                attendancevalue: "PRESENT",
+                status: "PRESENT",
                 createdAt: {
                     gte: new Date(
                         currentDate.getFullYear(),

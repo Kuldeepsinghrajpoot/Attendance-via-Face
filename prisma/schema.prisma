@@ -7,16 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Attendance {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  student         Student         @relation(fields: [studentId], references: [id])
-  teacher         Roles?          @relation(fields: [RoleId], references: [id])
-  studentId       String          @db.ObjectId
-  RoleId          String?         @db.ObjectId
-  attendancevalue AttendanceValue
-  subject Subject[]
+model Subject {
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName          String
+  branch               Branch?             @relation(fields: [branchId], references: [id])
+  branchId             String?             @db.ObjectId
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  teacher              Roles?              @relation(fields: [teacherId], references: [id])
+  teacherId            String?             @db.ObjectId
+  Enroll               Enroll[]
+  // schedule        ScheduleAttendance? @relation(fields: [scheduleId], references: [id])
+  // scheduleId           String?             @unique @db.ObjectId
+  attendances          Attendance[] // Link to daily attendance records
+  ScheduleSubject      ScheduleSubject[]
+  ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  scheduleAttendanceId String?             @db.ObjectId
+  TeacherSubject       TeacherSubject[]
+}
+
+model Roles {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  email          String           @unique
+  password       String
+  role           RoleType
+  firstName      String
+  lastName       String?
+  phone          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  branch         Branch?          @relation(fields: [branchId], references: [id])
+  branchId       String?          @db.ObjectId
+  Subject        Subject[]
+  TeacherSubject TeacherSubject[]
+}
+
+model TeacherSubject {
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  teacher              Roles               @relation(fields: [teacherId], references: [id])
+  teacherId            String              @db.ObjectId
+  subject              Subject             @relation(fields: [subjectId], references: [id])
+  subjectId            String              @db.ObjectId
+  // New relation to schedule attendance for this teacher's assignment to the subject.
+  scheduleAttendanceId String?             @db.ObjectId
+  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  assignedAt           DateTime            @default(now())
+  Enroll               Enroll[]
+}
+
+model TeacherScheduleAttendance {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  teacherId  String   @db.ObjectId
+  subjectId  String   @db.ObjectId
+  scheduleId String   @db.ObjectId
+  // Optionally, add timestamps, session info, etc.
+  createdAt  DateTime @default(now())
+}
+
+model Batch {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  batch     String    @unique
+  Enroll    Enroll[]
+  students  Student[] @relation("StudentToBatch")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Branch {
@@ -25,53 +79,8 @@ model Branch {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   branchName String    @unique
-  students   Student[]
-
-  Roles Roles[]
-}
-
-model Subject {
-  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName          String
-  branch               Branch?             @relation(fields: [branchId], references: [id])
-  branchId             String?             @db.ObjectId
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
-  teacher              Roles?              @relation(fields: [teacherId], references: [id]) // Optional relation if needed.
-  teacherId            String?             @db.ObjectId
-  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
-  scheduleAttendanceId String?             @db.ObjectId
-  
-  
-  attendance   Attendance? @relation(fields: [AttendanceId], references: [id])
-  AttendanceId String?             @db.ObjectId
-  Enroll               Enroll[]
-}
-
-model Roles {
-  id         String       @id @default(auto()) @map("_id") @db.ObjectId
-  email      String       @unique
-  password   String
-  role       RoleType
-  subjects   Subject[]
-  firstName  String
-  lastName   String?
-  phone      String
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  Enroll     Enroll[]
-  branch     Branch?      @relation(fields: [branchId], references: [id])
-  branchId   String?      @db.ObjectId
-  Attendance Attendance[]
-}
-
-model Batch {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  batch     String    @unique // Example: "A", "B", "C"
-  students  Student[] @relation("BatchToStudent")
-  Enroll    Enroll[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  Roles      Roles[]
+  students   Student[] @relation("StudentToBranch")
 }
 
 model Student {
@@ -82,44 +91,69 @@ model Student {
   avatar     String
   password   String
   rollNumber String
-  batch      Batch?       @relation(fields: [batchId], references: [id], name: "BatchToStudent")
-  batchId    String?      @db.ObjectId
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   role       RoleType
+  phone      String?
+  branch     Branch       @relation(fields: [branchId], references: [id], name: "StudentToBranch")
+  branchId   String       @db.ObjectId
+  batch      Batch        @relation(fields: [batchId], references: [id], name: "StudentToBatch")
+  batchId    String       @db.ObjectId
   Enroll     Enroll[]
   Attendance Attendance[]
-  phone      String?
-  branch     Branch?      @relation(fields: [branchId], references: [id])
-  branchId   String?      @db.ObjectId
+
+  @@index([rollNumber])
+  @@index([phone])
 }
 
 model Enroll {
-  id           String             @id @default(auto()) @map("_id") @db.ObjectId
-  student      Student            @relation(fields: [studentId], references: [id])
-  studentId    String             @db.ObjectId
-  teacher      Roles              @relation(fields: [teacherId], references: [id])
-  teacherId    String             @db.ObjectId
-  subject      Subject            @relation(fields: [subjectId], references: [id])
-  subjectId    String             @db.ObjectId
-  batch        Batch              @relation(fields: [batchId], references: [id])
-  batchId      String             @db.ObjectId
-  attendance   ScheduleAttendance @relation(fields: [attendanceId], references: [id])
-  attendanceId String             @db.ObjectId
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  session      String
-  year         String
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  student          Student         @relation(fields: [studentId], references: [id])
+  studentId        String          @db.ObjectId
+  subject          Subject         @relation(fields: [subjectId], references: [id])
+  subjectId        String          @db.ObjectId
+  batch            Batch           @relation(fields: [batchId], references: [id])
+  batchId          String          @db.ObjectId
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  session          String
+  year             String
+  teacherSubjectId String?         @db.ObjectId
+  teacherSubject   TeacherSubject? @relation(fields: [teacherSubjectId], references: [id])
 }
 
 model ScheduleAttendance {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  subjects  Subject[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  startTime DateTime?
-  endTime   DateTime?
-  Enroll    Enroll[]
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  startTime       DateTime?
+  endTime         DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  ScheduleSubject ScheduleSubject[]
+  Subject         Subject[]
+  Attendance      Attendance[]
+  TeacherSubject  TeacherSubject[]
+}
+
+model ScheduleSubject {
+  id         String             @id @default(auto()) @map("_id") @db.ObjectId
+  schedule   ScheduleAttendance @relation(fields: [scheduleId], references: [id])
+  scheduleId String             @db.ObjectId
+  subject    Subject            @relation(fields: [subjectId], references: [id])
+  subjectId  String             @db.ObjectId
+}
+
+model Attendance {
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  student              Student             @relation(fields: [studentId], references: [id])
+  studentId            String              @db.ObjectId
+  subject              Subject             @relation(fields: [subjectId], references: [id])
+  subjectId            String              @db.ObjectId
+  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  scheduleAttendanceId String?             @db.ObjectId
+  status               AttendanceValue
+  date                 DateTime            @default(now())
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
 }
 
 enum RoleType {
@@ -133,4 +167,5 @@ enum AttendanceValue {
   ABSENT
   LATE
   EXCUSED
+  NOT_MARKED
 }

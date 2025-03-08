@@ -8,7 +8,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import FaceVerify from "./face";
 import CameraCapture from "./capture";
 
 interface Teacher {
@@ -29,8 +28,9 @@ interface Subject {
     id: string;
     subjectName: string;
     branch: string | null;
-    teacher: Teacher;
-    scheduleAttendance: ScheduleAttendance;
+    teacher: Teacher | null;
+    // ScheduleAttendance can be either null, a single object, or an array.
+    ScheduleAttendance: ScheduleAttendance | ScheduleAttendance[] | null;
     attendance: boolean | null;
 }
 
@@ -44,7 +44,6 @@ interface Enroll {
     year: string;
     batch: Batch;
     subject: Subject;
-    teacher: Teacher;
 }
 
 interface StudentData {
@@ -66,10 +65,10 @@ interface StudentData {
 }
 
 interface AttendanceTableProps {
-    data: StudentData[];
+    data: StudentData;
 }
 
-// Function to format date and time
+// Function to format date and time.
 const formatDateTime = (dateTime: string) => {
     const date = new Date(dateTime);
     const formattedDate = date.toLocaleDateString("en-GB"); // Format: DD/MM/YYYY
@@ -77,15 +76,14 @@ const formatDateTime = (dateTime: string) => {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-    }); // Format: HH:MM:SS
+    });
     return { date: formattedDate, time: formattedTime };
 };
 
 export default function AttendanceTable({ data }: AttendanceTableProps) {
-    if (!data || data.length === 0 || !data[0].Enroll || data[0].Enroll.length === 0) {
+    if (!data?.Enroll || data.Enroll.length === 0) {
         return <p>No attendance data available.</p>;
     }
-
     return (
         <div className="md:flex md:justify-start gap-24">
             <div className="w-full dark:bg-background rounded-md px-6 py-5">
@@ -103,38 +101,65 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data[0].Enroll.map((enroll, index) => {
-                            if (!enroll.subject || !enroll.subject.scheduleAttendance) return null;
+                        {data.Enroll.map((enroll, index) => {
+                            // Normalize ScheduleAttendance to an array.
+                            const scheduleData = enroll.subject.ScheduleAttendance
+                                ? Array.isArray(enroll.subject.ScheduleAttendance)
+                                    ? enroll.subject.ScheduleAttendance
+                                    : [enroll.subject.ScheduleAttendance]
+                                : [];
 
-                            const { session, year, batch, subject } = enroll;
-                            const { scheduleAttendance } = subject;
-                            const formattedStart = formatDateTime(scheduleAttendance.startTime);
-                            const formattedEnd = formatDateTime(scheduleAttendance.endTime);
+                            // If no schedule data is found, render a single row with "N/A".
+                            if (scheduleData.length === 0) {
+                                return (
+                                    <TableRow key={index}>
+                                        <TableCell>{enroll.session}</TableCell>
+                                        <TableCell>{enroll.year}</TableCell>
+                                        <TableCell>{enroll.batch.batch}</TableCell>
+                                        <TableCell>{enroll.subject.subjectName}</TableCell>
+                                        <TableCell>N/A</TableCell>
+                                        <TableCell>N/A</TableCell>
+                                        <TableCell>N/A</TableCell>
+                                        <TableCell>
+                                            <CameraCapture attendanceData={{
+                                                subjectId: enroll.subject.id,
+                                                scheduleId: "",
+                                                date: "N/A",
+                                                time: "N/A",
+                                            }} />
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            }
 
-                            return (
-                                <TableRow key={index}>
-                                    <TableCell>{session}</TableCell>
-                                    <TableCell>{year}</TableCell>
-                                    <TableCell>{batch.batch}</TableCell>
-                                    <TableCell>{subject.subjectName}</TableCell>
-                                    <TableCell>{formattedStart.date}</TableCell>
-                                    <TableCell>{formattedStart.time}</TableCell>
-                                    <TableCell>{formattedEnd.time}</TableCell>
-                                    <TableCell className="text-right">
+                            // Render a row for each schedule item.
+                            return scheduleData.map((schedule, scheduleIndex) => {
+                                const formattedStart = formatDateTime(schedule.startTime);
+                                const formattedEnd = formatDateTime(schedule.endTime);
 
-                                    {/* <button onClick={()=>alert("asdf") }>onClick</button> */}
-                                       
-                                       <CameraCapture attendanceData={
-                                             {   subjectId:subject.subjectName,
-                                                  scheduleId: scheduleAttendance.id,
-                                                  date: formattedStart.date,
-                                                  time: formattedStart.time,
-                                             }
-                                       }/>
-                                       {/* <Mark/> */}
-                                    </TableCell>
-                                </TableRow>
-                            );
+                                return (
+                                    <TableRow key={`${index}-${scheduleIndex}`}>
+                                        <TableCell>{enroll.session}</TableCell>
+                                        <TableCell>{enroll.year}</TableCell>
+                                        <TableCell>{enroll.batch.batch}</TableCell>
+                                        <TableCell>{enroll.subject.subjectName}</TableCell>
+                                        <TableCell>{formattedStart.date}</TableCell>
+                                        <TableCell>{formattedStart.time}</TableCell>
+                                        <TableCell>{formattedEnd.time}</TableCell>
+                                        <TableCell className="flex items-center">
+
+                                            {data.Attendance.some(att => att.status === "PRESENT") ? "PRESENT" :
+                                                <CameraCapture attendanceData={{
+                                                    subjectId: enroll.subject.id,
+                                                    scheduleId: schedule.id,
+                                                    date: formattedStart.date,
+                                                    time: formattedStart.time,
+                                                }} />
+                                            }
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            });
                         })}
                     </TableBody>
                 </Table>

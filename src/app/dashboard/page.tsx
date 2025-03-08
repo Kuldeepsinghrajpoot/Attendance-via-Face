@@ -37,7 +37,6 @@ const cartItem = [
     },
 ];
 const Page = () => {
-    const { data: session } = useSession();
     return (
         <div className="p-4">
             {/* Cards Section */}
