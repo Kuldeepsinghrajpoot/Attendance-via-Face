@@ -4,7 +4,8 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { User2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-
+import { toast } from "react-toastify";
+import { useRouter } from 'next/navigation'
 export default function CameraCapture({ attendanceData }: any) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -13,11 +14,12 @@ export default function CameraCapture({ attendanceData }: any) {
   const [attendanceMarked, setAttendanceMarked] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false); // Track dialog open/close state
 
+  const Router = useRouter();
 
   const { data: session } = useSession();
   const id = session?.user?.id;
 
-  console.log(id);
+
   useEffect(() => {
     if (open) {
       startCamera();
@@ -73,20 +75,19 @@ export default function CameraCapture({ attendanceData }: any) {
           });
 
           const verifyData = await verifyResponse.json();
-          console.log("Verify Response:", verifyData);
-          setMatchResult(verifyData.name);
 
-          if (verifyData.error === "200") {
+          setMatchResult(verifyData.name);
+          if (verifyData.status === "200") {
+            // Router.refresh();
             await markAttendance(verifyData.name);
           }
         } catch (error) {
-          console.error("Error verifying face:", error);
+
           setMatchResult("Verification failed.");
         }
       }
     }
   };
-
 
   const markAttendance = async (name: string) => {
     try {
@@ -97,12 +98,16 @@ export default function CameraCapture({ attendanceData }: any) {
       });
 
       const data = await response.json();
-      setAttendanceMarked(true);
-      console.log("Attendance Response:", data);
+      if (data.status === "200") {
 
+        setAttendanceMarked(true);
+        toast.success("Attendance marked successfully.");
+
+      }
+      Router.refresh
       stopCamera(); // Stop camera after attendance is marked
     } catch (error) {
-      console.error("Error marking attendance:", error);
+      toast.error("Failed to mark attendance.");
     }
   };
 
@@ -123,7 +128,7 @@ export default function CameraCapture({ attendanceData }: any) {
               <h3 className="text-lg font-semibold">Captured Image:</h3>
               <img src={capturedImage} alt="Captured" className="w-80 h-60 border rounded-lg " />
               {matchResult && <p className="text-lg font-bold">{matchResult}</p>}
-              {attendanceMarked && <p className="text-green-600 font-bold">Attendance Marked Successfully</p>}
+              {attendanceMarked && <p className="text-primary font-bold">Attendance Marked Successfully</p>}
             </>
           )}
         </div>

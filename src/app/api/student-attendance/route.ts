@@ -7,7 +7,7 @@ import { ObjectId } from "mongodb"; // Import ObjectId to validate id
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-    const id = req.nextUrl.searchParams.get("id");
+    const id = req?.nextUrl?.searchParams?.get("id");
 
     if (!id) {
         return NextResponse.json(new ApiError(403, "id not found"));
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
                   status: true,
                   createdAt: true,
                   subjectId: true,
-                //   scheduleId: true,
+                  scheduleId: true,
                 },
               },
             },

@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
     try {
         const id = new URL(req.url).searchParams.get("id");
-        console.log(id);
+
 
         if (!id) {
             return NextResponse.json(
@@ -19,9 +19,6 @@ export async function POST(req: NextRequest) {
         const data = await req.json();
         const { email, role, password, firstName, phone, lastName } =
             data?.values;
-
-        console.log(data);
-
         if (
             ![email, role, password, firstName, phone, lastName].every(
                 (value) => value
@@ -45,7 +42,11 @@ export async function POST(req: NextRequest) {
             data: { role, email, password, firstName, phone, lastName },
         });
 
-        console.log(teacher);
+        if (!teacher) {
+            return NextResponse.json(
+                new ApiError(402, "", "Error creating account")
+            );
+        }
 
         return NextResponse.json(
             new ApiResponse({

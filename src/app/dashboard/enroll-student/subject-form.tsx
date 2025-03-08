@@ -24,14 +24,23 @@ import {
 import React, { useState } from "react";
 import axios from "axios";
 import { EnrollSchema, enrollSchema } from "@/schema/enroll-student";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
-export function SubjectForm() {
+export function SubjectForm({ data }: { data: any }) {
     const { data: session, status } = useSession();
-    console.log(session?.user?.id);
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    // Redirect to dashboard if user is logged in
+    if (status === "loading") return <div>Loading...</div>;
 
+    // Initialize react-hook-form with zodResolver
     const form = useForm<EnrollSchema>({
         resolver: zodResolver(enrollSchema),
         defaultValues: {},
@@ -39,7 +48,6 @@ export function SubjectForm() {
 
     const onSubmit: SubmitHandler<EnrollSchema> = React.useCallback(
         async (values) => {
-            console.log(values);
             Swal.fire({
                 title: "Creating account",
                 text: "Please wait...",
@@ -51,19 +59,14 @@ export function SubjectForm() {
             try {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_PORT}/api/role?id=${session?.user?.id}`,
+                    { values },
                     {
-                        values,
-                    },
-                    {
-                        headers: {
-                            "Content-type": "applicaton/json",
-                        },
+                        headers: { "Content-type": "application/json" },
                     }
                 );
-                console.log(res);
+
                 Swal.close();
-                const response = res;
-                if (response?.data?.status === 200) {
+                if (res.data.status === 200) {
                     Swal.fire({
                         icon: "success",
                         title: "Success!",
@@ -71,17 +74,15 @@ export function SubjectForm() {
                         timer: 2000,
                         showConfirmButton: false,
                     });
-
                     setDialogOpen(false);
                     form.reset();
                 } else {
-                    form.reset();
                     setDialogOpen(false);
-
+                    form.reset();
                     Swal.fire({
                         icon: "error",
                         title: "Account creation Failed",
-                        text: "You are not authorize",
+                        text: "You are not authorized",
                         confirmButtonColor: "red",
                     });
                 }
@@ -94,8 +95,11 @@ export function SubjectForm() {
                 });
             }
         },
-        [session]
+        [session, form]
     );
+
+    // Destructure API data for easier access
+    const { batch, branch, subject } = data.data;
 
     return (
         <Dialog
@@ -118,25 +122,48 @@ export function SubjectForm() {
                     </DialogTitle>
                 </DialogHeader>
                 <FormProvider {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                    <form onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="grid gap-4 grid-cols-2 py-4">
+                            {/* Example: Using a dropdown for subjects */}
                             <FormField
                                 control={form.control}
                                 name="subjectId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Subject</FormLabel>
+                                        <FormLabel>Select Subject</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Subject"
-                                                {...field}
-                                            />
+                                            <Select {...field}>
+                                                <SelectTrigger className="w-[180px]">
+                                                    <SelectValue placeholder="Select a fruit" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>
+                                                            Select Subject
+                                                        </SelectLabel>
+                                                        {subject.map(
+                                                            (sub: any) => (
+                                                                <SelectItem
+                                                                    key={sub.id}
+                                                                    value={
+                                                                        sub.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        sub.subjectName
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+                            {/* Similarly for Branch */}
                             <FormField
                                 control={form.control}
                                 name="branchId"
@@ -144,16 +171,40 @@ export function SubjectForm() {
                                     <FormItem>
                                         <FormLabel>Branch</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Branch"
-                                                {...field}
-                                            />
+                                            <Select {...field}>
+                                                <SelectTrigger className="w-[180px]">
+                                                    <SelectValue placeholder="Select a Branch" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>
+                                                            Select Branch
+                                                        </SelectLabel>
+                                                        {branch.map(
+                                                            (branch: any) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        branch.id
+                                                                    }
+                                                                    value={
+                                                                        branch.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        branch.branchName
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+                            {/* Continue with other fields as needed */}
                             <FormField
                                 control={form.control}
                                 name="session"
@@ -166,7 +217,6 @@ export function SubjectForm() {
                                                 {...field}
                                             />
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -179,11 +229,10 @@ export function SubjectForm() {
                                         <FormLabel>Student Year</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder=" Student Year"
+                                                placeholder="Student Year"
                                                 {...field}
                                             />
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -195,18 +244,40 @@ export function SubjectForm() {
                                     <FormItem>
                                         <FormLabel>Batch</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Batch"
-                                                {...field}
-                                            />
+                                            <Select {...field}>
+                                                <SelectTrigger className="w-[180px]">
+                                                    <SelectValue placeholder="Select a fruit" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>
+                                                            Select Batch
+                                                        </SelectLabel>
+                                                        {batch.map(
+                                                            (batch: any) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        batch.id
+                                                                    }
+                                                                    value={
+                                                                        batch.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        batch.batch
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
-
                         <DialogFooter>
                             <Button
                                 type="submit"

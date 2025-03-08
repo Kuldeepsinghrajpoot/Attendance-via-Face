@@ -68,12 +68,12 @@ async def verify_face(image: Image):
                 result = DeepFace.verify(temp_image_path, known_image_path)
                 if result.get("verified"):
                     os.remove(temp_image_path)
-                    return {"name": student_name, "error": "200"}
+                    return {"name": student_name, "status": "200"}
             except Exception as e:
                 print("Error in DeepFace verification:", e)
         
         os.remove(temp_image_path)
-        return {"name": "User not found", "error": "404"}
+        return {"name": "User not found", "status": "404"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")

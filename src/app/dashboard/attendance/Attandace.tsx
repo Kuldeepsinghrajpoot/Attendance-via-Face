@@ -29,8 +29,6 @@ interface Subject {
     subjectName: string;
     branch: string | null;
     teacher: Teacher | null;
-    // ScheduleAttendance can be either null, a single object, or an array.
-    ScheduleAttendance: ScheduleAttendance | ScheduleAttendance[] | null;
     attendance: boolean | null;
 }
 
@@ -39,11 +37,25 @@ interface Batch {
     batch: string;
 }
 
+interface TeacherSubject {
+    // Contains schedule attendance data that is teacher-specific.
+    scheduleAttendance: ScheduleAttendance | ScheduleAttendance[] | null;
+}
+
 interface Enroll {
     session: string;
     year: string;
     batch: Batch;
     subject: Subject;
+    teacherSubject: TeacherSubject;
+}
+
+interface AttendanceRecord {
+    id: string;
+    status: "PRESENT" | "ABSENT" | string;
+    subjectId: string;
+    scheduleId: string;
+    createdAt: string;
 }
 
 interface StudentData {
@@ -61,7 +73,7 @@ interface StudentData {
     phone: string | null;
     branchId: string | null;
     Enroll: Enroll[];
-    Attendance: any[]; // Define if necessary
+    Attendance: AttendanceRecord[];
 }
 
 interface AttendanceTableProps {
@@ -84,6 +96,7 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
     if (!data?.Enroll || data.Enroll.length === 0) {
         return <p>No attendance data available.</p>;
     }
+
     return (
         <div className="md:flex md:justify-start gap-24">
             <div className="w-full dark:bg-background rounded-md px-6 py-5">
@@ -102,14 +115,14 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
                     </TableHeader>
                     <TableBody>
                         {data.Enroll.map((enroll, index) => {
-                            // Normalize ScheduleAttendance to an array.
-                            const scheduleData = enroll.subject.ScheduleAttendance
-                                ? Array.isArray(enroll.subject.ScheduleAttendance)
-                                    ? enroll.subject.ScheduleAttendance
-                                    : [enroll.subject.ScheduleAttendance]
+                            // Normalize schedule attendance from teacherSubject.
+                            const scheduleData = enroll.teacherSubject.scheduleAttendance
+                                ? Array.isArray(enroll.teacherSubject.scheduleAttendance)
+                                    ? enroll.teacherSubject.scheduleAttendance
+                                    : [enroll.teacherSubject.scheduleAttendance]
                                 : [];
 
-                            // If no schedule data is found, render a single row with "N/A".
+                            // If no schedule data is found, render a row with "N/A".
                             if (scheduleData.length === 0) {
                                 return (
                                     <TableRow key={index}>
@@ -137,6 +150,14 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
                                 const formattedStart = formatDateTime(schedule.startTime);
                                 const formattedEnd = formatDateTime(schedule.endTime);
 
+                                // Check if attendance has been marked for this subject and schedule.
+                                const isPresent = data.Attendance.some(
+                                    (att) =>
+                                        att.status === "PRESENT" &&
+                                        att.subjectId === enroll.subject.id &&
+                                        att.scheduleId === schedule.id
+                                );
+
                                 return (
                                     <TableRow key={`${index}-${scheduleIndex}`}>
                                         <TableCell>{enroll.session}</TableCell>
@@ -146,16 +167,20 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
                                         <TableCell>{formattedStart.date}</TableCell>
                                         <TableCell>{formattedStart.time}</TableCell>
                                         <TableCell>{formattedEnd.time}</TableCell>
-                                        <TableCell className="flex items-center">
-
-                                            {data.Attendance.some(att => att.status === "PRESENT") ? "PRESENT" :
-                                                <CameraCapture attendanceData={{
-                                                    subjectId: enroll.subject.id,
-                                                    scheduleId: schedule.id,
-                                                    date: formattedStart.date,
-                                                    time: formattedStart.time,
-                                                }} />
-                                            }
+                                        <TableCell>
+                                            {isPresent ? (
+                                                <span className="text-primary font-bold">PRESENT</span>
+                                            ) : (
+                                                <CameraCapture
+                                                    attendanceData={{
+                                                        subjectId: enroll.subject.id,
+                                                        scheduleId: schedule.id,
+                                                        date: formattedStart.date,
+                                                        time: formattedStart.time,
+                                                    }}
+                                                    disabled={false}
+                                                />
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 );

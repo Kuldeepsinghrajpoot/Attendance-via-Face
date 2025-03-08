@@ -143,17 +143,16 @@ model ScheduleSubject {
 }
 
 model Attendance {
-  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
-  student              Student             @relation(fields: [studentId], references: [id])
-  studentId            String              @db.ObjectId
-  subject              Subject             @relation(fields: [subjectId], references: [id])
-  subjectId            String              @db.ObjectId
-  scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
-  scheduleAttendanceId String?             @db.ObjectId
-  status               AttendanceValue
-  date                 DateTime            @default(now())
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
+  student            Student             @relation(fields: [studentId], references: [id])
+  studentId          String              @db.ObjectId
+  subject            Subject             @relation(fields: [subjectId], references: [id])
+  subjectId          String              @db.ObjectId
+  scheduleAttendance ScheduleAttendance? @relation(fields: [scheduleId], references: [id])
+  scheduleId         String?             @db.ObjectId
+  status             AttendanceValue
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
 enum RoleType {
