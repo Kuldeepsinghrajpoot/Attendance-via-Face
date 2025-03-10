@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -33,17 +34,24 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useRouter } from "next/navigation";
 
 export function SubjectForm({ data }: { data: any }) {
     const { data: session, status } = useSession();
     const [dialogOpen, setDialogOpen] = useState(false);
-
+const router = useRouter();
     if (status === "loading") return <div>Loading...</div>;
 
     // Initialize react-hook-form with zodResolver
     const form = useForm<EnrollSchema>({
         resolver: zodResolver(enrollSchema),
-        defaultValues: {},
+        defaultValues: {
+            branchId: "",
+            batchId: "",
+            subjectId: "",
+            session: "",
+            year: "",
+        },
     });
 
     const onSubmit: SubmitHandler<EnrollSchema> = React.useCallback(
@@ -58,13 +66,12 @@ export function SubjectForm({ data }: { data: any }) {
 
             try {
                 const res = await axios.post(
-                    `${process.env.NEXT_PUBLIC_PORT}/api/role?id=${session?.user?.id}`,
+                    `${process.env.NEXT_PUBLIC_PORT}/api/enroll-student?id=${session?.user?.id}`,
                     { values },
                     {
                         headers: { "Content-type": "application/json" },
                     }
                 );
-
                 Swal.close();
                 if (res.data.status === 200) {
                     Swal.fire({
@@ -76,6 +83,9 @@ export function SubjectForm({ data }: { data: any }) {
                     });
                     setDialogOpen(false);
                     form.reset();
+                    setInterval(() => {
+                        router.refresh()
+                    },1000)
                 } else {
                     setDialogOpen(false);
                     form.reset();
@@ -87,7 +97,6 @@ export function SubjectForm({ data }: { data: any }) {
                     });
                 }
             } catch (error) {
-                console.error("account creation Error:", error);
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
@@ -97,7 +106,6 @@ export function SubjectForm({ data }: { data: any }) {
         },
         [session, form]
     );
-
     // Destructure API data for easier access
     const { batch, branch, subject } = data.data;
 
@@ -115,55 +123,19 @@ export function SubjectForm({ data }: { data: any }) {
                     <span>Enroll Student</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[625px]">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle className="text-center text-xl font-semibold">
                         Enroll Student
                     </DialogTitle>
+                    <DialogDescription className="text-center">
+                        Please fill in the details to enroll a student
+                    </DialogDescription>
                 </DialogHeader>
                 <FormProvider {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <div className="grid gap-4 grid-cols-2 py-4">
+                        <div className="grid gap-4  py-4">
                             {/* Example: Using a dropdown for subjects */}
-                            <FormField
-                                control={form.control}
-                                name="subjectId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Select Subject</FormLabel>
-                                        <FormControl>
-                                            <Select {...field}>
-                                                <SelectTrigger className="w-[180px]">
-                                                    <SelectValue placeholder="Select a fruit" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectGroup>
-                                                        <SelectLabel>
-                                                            Select Subject
-                                                        </SelectLabel>
-                                                        {subject.map(
-                                                            (sub: any) => (
-                                                                <SelectItem
-                                                                    key={sub.id}
-                                                                    value={
-                                                                        sub.id
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        sub.subjectName
-                                                                    }
-                                                                </SelectItem>
-                                                            )
-                                                        )}
-                                                    </SelectGroup>
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            {/* Similarly for Branch */}
                             <FormField
                                 control={form.control}
                                 name="branchId"
@@ -171,8 +143,8 @@ export function SubjectForm({ data }: { data: any }) {
                                     <FormItem>
                                         <FormLabel>Branch</FormLabel>
                                         <FormControl>
-                                            <Select {...field}>
-                                                <SelectTrigger className="w-[180px]">
+                                            <Select  onValueChange={field.onChange} defaultValue={field.value}>
+                                                <SelectTrigger>
                                                     <SelectValue placeholder="Select a Branch" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -204,39 +176,6 @@ export function SubjectForm({ data }: { data: any }) {
                                     </FormItem>
                                 )}
                             />
-                            {/* Continue with other fields as needed */}
-                            <FormField
-                                control={form.control}
-                                name="session"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Session</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Session"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="year"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Student Year</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Student Year"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                             <FormField
                                 control={form.control}
                                 name="batchId"
@@ -244,9 +183,9 @@ export function SubjectForm({ data }: { data: any }) {
                                     <FormItem>
                                         <FormLabel>Batch</FormLabel>
                                         <FormControl>
-                                            <Select {...field}>
-                                                <SelectTrigger className="w-[180px]">
-                                                    <SelectValue placeholder="Select a fruit" />
+                                            <Select  onValueChange={field.onChange} defaultValue={field.value}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Branch" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectGroup>
@@ -272,6 +211,79 @@ export function SubjectForm({ data }: { data: any }) {
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="subjectId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Select Subject</FormLabel>
+                                        <FormControl>
+                                            <Select  onValueChange={field.onChange} defaultValue={field.value}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Subject" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>
+                                                            Select Subject
+                                                        </SelectLabel>
+                                                        {subject.map(
+                                                            (sub: any) => (
+                                                                <SelectItem
+                                                                    key={sub.id}
+                                                                    value={
+                                                                        sub.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        sub.subjectName
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {/* Similarly for Branch */}
+
+                            {/* Continue with other fields as needed */}
+                            <FormField
+                                control={form.control}
+                                name="session"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Academic Year</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Academic Year"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="year"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Student Year</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Student Year"
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

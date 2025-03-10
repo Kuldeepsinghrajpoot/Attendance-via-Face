@@ -155,7 +155,9 @@ export default function AttendanceTable({ data }: AttendanceTableProps) {
                                     (att) =>
                                         att.status === "PRESENT" &&
                                         att.subjectId === enroll.subject.id &&
-                                        att.scheduleId === schedule.id
+                                        att.scheduleId === schedule.id &&
+                                        att.createdAt.includes(formattedStart.date)
+                                        
                                 );
 
                                 return (

@@ -1,7 +1,8 @@
 import React from "react";
 import EnrollTable from "./table";
-import { SubjectForm } from "./subject-form";
+import { SubjectForm } from "./enroll-student-form";
 import { auth } from "@/app/api/auth";
+
 
 const getBasicInfo = async ({ id }: { id: string }) => {
     try {
@@ -23,6 +24,7 @@ async function page() {
             <div className="flex justify-start gap-2 h-12 max-h-min">
                 
                 <SubjectForm data={data}/>
+         
             </div>
             <div className="bg-background border rounded-md p-4 my-4">
                 <EnrollTable />

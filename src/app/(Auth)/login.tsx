@@ -44,7 +44,7 @@ export function Login() {
   });
 
   const onSubmit: SubmitHandler<LoginType> = async (values) => {
-    console.log(values)
+
     Swal.fire({
       title: 'Logging in...',
       text:"Please wait...",

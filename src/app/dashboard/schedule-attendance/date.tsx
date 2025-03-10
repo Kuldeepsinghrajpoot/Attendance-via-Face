@@ -66,7 +66,8 @@ export function DateTimePicker24hForm({
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_PORT}/api/schedule-attendance?id=${id}`,
-                requestData,
+                JSON.stringify(requestData),
+                // requestData,
                 { timeout: 5000 }
             );
             console.log(res);

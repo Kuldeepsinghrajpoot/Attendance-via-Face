@@ -1,4 +1,4 @@
-import { SubjectForm } from "../subject-form";
+import { SubjectForm } from "../enroll-student-form";
 import axios from "axios";
 import { auth } from "@/app/api/auth";
 import EnrollTable from "./table";

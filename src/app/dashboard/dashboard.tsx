@@ -89,7 +89,7 @@ export default function Dashboard({ children }: { children: any }) {
             : navItems;
 
     return (
-        <div className="grid min-h-screen  w-full md:grid-cols-[220px_1fr] lg:grid-cols-[220px_1fr] bg-muted/40">
+        <div className="grid min-h-screen relative  z-20 w-full md:grid-cols-[220px_1fr] lg:grid-cols-[220px_1fr] ">
             {/* Sidebar */}
             <div className="hidden border-r md:block">
                 <div className="flex h-full max-h-screen flex-col gap-2 sticky top-0 bg-background">
@@ -123,7 +123,7 @@ export default function Dashboard({ children }: { children: any }) {
 
                     {/* Sidebar Navigation */}
                     <div className="flex-1  bg-background px-2 lg:px-4">
-                        <nav className="grid z-50 items-start text-sm font-medium gap-1">
+                        <nav className="grid  items-start text-sm font-medium gap-1">
                             <span className="capitalize text-sm font-medium my-1">
                                 DASHBOARD
                             </span>
@@ -173,9 +173,9 @@ export default function Dashboard({ children }: { children: any }) {
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-col ">
+            <div className="flex flex-col z-20 ">
                 {/* Top Navigation Bar */}
-                <nav className="flex h-14 z-50  items-center bg-background gap-4 border-b px-4 lg:h-[60px] lg:px-6 sticky top-0">
+                <nav className="flex h-14   items-center bg-background z-20 gap-4 border-b px-4 lg:h-[60px] lg:px-6 sticky top-0">
                     {/* Mobile Sidebar Trigger */}
                     <Sheet>
                         <SheetTrigger asChild>
