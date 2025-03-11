@@ -45,7 +45,7 @@ export async function AttendanceSchedule() {
     const response = await fetchUserEnrollments({ id });
     // Assuming the API returns the grouped data directly as response.data
     const enrollmentList = response.data || [];
-    // console.log(enrollmentList);
+    console.log(enrollmentList);
     return (
         <Table>
             <TableCaption>
@@ -58,17 +58,18 @@ export async function AttendanceSchedule() {
                     <TableHead>Session (Academic Year)</TableHead>
                     <TableHead>Study Year</TableHead>
                     <TableHead>Student Count</TableHead>
+                    <TableHead>Date</TableHead>
                     <TableHead>Start Time</TableHead>
                     <TableHead>End Time</TableHead>
-                    <TableHead>Add Time</TableHead>
-                    <TableHead>Mark</TableHead>
+                    <TableHead>Schedule Attendance</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {enrollmentList.map((enroll: any, index: number) => {
                     
                     const{scheduleAttendance} = enroll;
-                    console.log(scheduleAttendance);
+
+                    // console.log(scheduleAttendance);
                     const {startTime, endTime} = scheduleAttendance ?? "N/A";
                    
                     const formattedStart = formatDateTime(startTime);
@@ -100,6 +101,9 @@ export async function AttendanceSchedule() {
                                         sessionId: enroll?.session,
                                         batchId: enroll?.batch.id,
                                         year: enroll?.year,
+                                        branchId: enroll?.branchId,
+                                        teacherId: id,
+                                       
                                     }}
                                 />
                             </TableCell>

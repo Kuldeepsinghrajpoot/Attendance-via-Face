@@ -1,173 +1,163 @@
-import { NextRequest, NextResponse } from "next/server";
-import { ApiError } from "../api-error";
 import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 import { ApiResponse } from "../api-response";
-import { ObjectId } from "bson";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest): Promise<Response> {
-    // Retrieve the student id from query parameters.
+export async function GET(req: NextRequest) {
+  try {
     const id = req.nextUrl.searchParams.get("id");
+    const dateParam = req.nextUrl.searchParams.get("date");
+
     if (!id) {
-        return NextResponse.json(new ApiError(403, "id not found"));
+      return NextResponse.json(
+        new ApiResponse({ status: 400, data: "Invalid request: Missing ID" })
+      );
     }
 
-    try {
-        // Validate the student id
-        if (!ObjectId.isValid(id)) {
-            return NextResponse.json(new ApiError(400, "Invalid student ID"));
-        }
-
-        // Fetch the student with related enrollments (including subject and batch details)
-        const student = await prisma.student.findUnique({
-            where: { id },
-            select: {
-                Enroll: {
-                    select: {
-                        id: true,
-                        session: true,
-                        year: true,
-                        batch: { select: { id: true, batch: true } },
-                        subject: {
-                            select: {
-                                id: true,
-                                subjectName: true,
-                                branchId: true,
-                            },
-                        },
-                        teacherSubject: {
-                            select: {
-                                scheduleAttendance: {
-                                    select: {
-                                        id: true,
-                                        startTime: true,
-                                        endTime: true,
-                                        Attendance: {
-                                            select: {
-                                                id: true,
-                                                status: true,
-                                                createdAt: true,
-                                                subjectId: true,
-                                                scheduleId: true,
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        });
-
-        if (!student) {
-            return NextResponse.json(new ApiError(404, "Student not found"));
-        }
-
-        // Extract filter parameters from the student's first enrollment.
-        // (You can extend this to loop over multiple enrollments if needed.)
-        if (!student.Enroll || student.Enroll.length === 0) {
-            return NextResponse.json(
-                new ApiError(404, "No enrollment records found for the student")
-            );
-        }
-
-        const enrollment = student.Enroll[0];
-        const subjectId = enrollment.subject.id;
-        const branchId = enrollment.subject.branchId;
-        const batchId = enrollment.batch.id;
-
-        // Fetch schedule attendance records with their related TeacherSubject and Subject details.
-        const scheduleAttendance = await prisma.scheduleAttendance.findMany({
-            include: {
-                TeacherSubject: {
-                    select: {
-                        id: true,
-                        teacherId: true,
-                        subject: { select: { id: true, subjectName: true } },
-                    },
-                },
-                Subject: {
-                    select: { id: true, subjectName: true, branchId: true },
-                },
-                Attendance: true,
-            },
-        });
-
-        // Count the number of schedule records for the subject (and branch)
-        const scheduleCount = await prisma.scheduleAttendance.count({
-            where: {
-                Subject: {
-                    some: {
-                        id: subjectId,
-                        branchId: branchId ?? undefined,
-                    },
-                },
-            },
-        });
-
-        // Count the number of attendance records with status PRESENT
-        // for that subject in the given branch and batch.
-        const presentCount = await prisma.attendance.count({
-            where: {
-                subjectId: subjectId,
-                status: "PRESENT",
-            },
-        });
-        const subjectIds = "67c56ae5cff552bd41006337"; // Example subject id for C++
-
-        const presentStudents = await prisma.attendance.findMany({
-            where: {
-                subjectId: subjectIds,
-                status: "PRESENT",
-            },
-            include: {
-                student: true, // Include student details if needed
-            },
-        });
-        const scheduleAttendances = await prisma.scheduleAttendance.findMany({
-            where: {
-                Subject: {
-                    some: {
-                        subjectName: "c++",
-                    },
-                },
-            },
-            include: {
-                TeacherSubject: {
-                    select: {
-                        id: true,
-                        teacherId: true,
-                        subject: { select: { id: true, subjectName: true } },
-                    },
-                },
-                Subject: true,
-                Attendance: true,
-            },
-        });
-
-        return NextResponse.json(
-            new ApiResponse({
-                status: 200,
-                data: {
-                    student,
-                    scheduleAttendance,
-                    scheduleCount,
-                    presentCount,
-                    presentStudents,
-                    scheduleAttendances,
-                },
-                message:
-                    "Student data retrieved successfully along with schedule and attendance counts",
-            })
-        );
-    } catch (error) {
-        console.error("Database Error:", error);
-        return NextResponse.json(
-            new ApiError(500, "Something went wrong", error)
-        );
-    } finally {
-        await prisma.$disconnect();
+    // Validate and parse date, defaulting to today if not provided.
+    const date = dateParam ? new Date(dateParam) : new Date();
+    if (isNaN(date.getTime())) {
+      return NextResponse.json(
+        new ApiResponse({ status: 400, data: "Invalid date format" })
+      );
     }
+
+    // Fetching data for a single **day**, not the whole month.
+    const startDate = new Date(date);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(date);
+    endDate.setHours(23, 59, 59, 999);
+
+    // Fetch schedules for the given day
+    const schedules = await prisma.scheduleAttendance.findMany({
+      where: {
+        startTime: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        Subject: { select: { id: true, subjectName: true } },
+        batch: { select: { id: true, batch: true } },
+        branch: { select: { id: true, branchName: true } },
+      },
+    });
+
+    // Fetch attendance records for the given day
+    const attendances = await prisma.attendance.findMany({
+      where: {
+        scheduleAttendance: {
+          startTime: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      },
+      select: {
+        id: true,
+        subject: { select: { id: true, subjectName: true } },
+        scheduleAttendance: {
+          select: {
+            Subject: { select: { subjectName: true } },
+            startTime: true,
+            endTime: true,
+            Role: { select: { firstName: true, role: true, email: true } },
+            batch: { select: { batch: true } },
+          },
+        },
+        student: {
+          select: {
+            Firstname: true,
+            role: true,
+            batch: { select: { batch: true } },
+            branch: { select: { branchName: true } },
+            rollNumber: true,
+          },
+        },
+        status: true,
+      },
+    });
+
+    // Fetch attendance summary for the given day
+    const attendanceRecord = await getAttendanceSummary(startDate);
+    // If no data found, return 404
+    if (schedules.length === 0 && attendances.length === 0) {
+      return NextResponse.json(
+        new ApiResponse({ status: 404, data: "No attendance records found" })
+      );
+    }
+
+    // Return successful response
+    return NextResponse.json(
+      new ApiResponse({
+        status: 200,
+        data: { schedules, attendances, attendanceRecord },
+      })
+    );
+  } catch (error) {
+    console.error("Error fetching attendance:", error);
+    return NextResponse.json(
+      new ApiResponse({ status: 500, data: "Internal server error" })
+    );
+  }
 }
+
+// 🔹 Fetch attendance summary for a specific day
+const getAttendanceSummary = async (date: Date) => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const attendanceRecords = await prisma.attendance.findMany({
+    where: {
+      scheduleAttendance: {
+        startTime: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+       
+      },
+    },
+    include: {
+      subject: true,
+      scheduleAttendance: { include: { Subject: true, batch: true } },
+      student: {
+        select: {
+          Firstname: true,
+          role: true,
+          batch: { select: { batch: true } },
+          rollNumber: true,
+        },
+      },
+    },
+  });
+
+  // Group attendance by subject and batch
+  const summary: Record<string, Record<string, { total: number; present: number; absent: number }>> = {};
+
+  attendanceRecords.forEach((record) => {
+    const subjectName = record.subject.subjectName;
+    const batchName = record.student.batch.batch;
+
+    if (!summary[subjectName]) {
+      summary[subjectName] = {};
+    }
+    if (!summary[subjectName][batchName]) {
+      summary[subjectName][batchName] = { total: 0, present: 0, absent: 0 };
+    }
+
+    summary[subjectName][batchName].total++;
+    if (record.status === "PRESENT") {
+      summary[subjectName][batchName].present++;
+    } else {
+      summary[subjectName][batchName].absent++;
+    }
+  });
+
+  return summary;
+};

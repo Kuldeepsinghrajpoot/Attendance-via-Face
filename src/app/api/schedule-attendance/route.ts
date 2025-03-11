@@ -11,6 +11,7 @@ interface ScheduleAttendance {
     endTime: Date;
     subjectId: string;
     batchId: string;
+    branchId: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -21,35 +22,60 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { subjectId, startTime, endTime,batchId }: ScheduleAttendance = await req.json();
-        console.log("Request body:", { subjectId, startTime, endTime ,batchId});
+        const { subjectId, startTime, endTime, batchId }: ScheduleAttendance = await req.json();
+        // console.log("Request body:", { subjectId, startTime, endTime, batchId, branchId });
 
-        if (![subjectId, teacherId, startTime, endTime].every(Boolean)) {
+        if (![subjectId, teacherId, startTime, endTime, batchId].every(Boolean)) {
             return NextResponse.json(new ApiError(400, "Invalid input", "Missing required details"));
         }
 
-        // Check if the teacher is assigned to the subject.
+        // Check if the teacher is assigned to the subject
         const teacherSubject = await prisma.teacherSubject.findFirst({
             where: {
-                teacherId,
-                subjectId,
-                // branchId,
+                teacherId: teacherId,
+                subjectId: subjectId
             },
+            select: {
+                id: true
+            }
         });
-
+        // console.log(teacherSubject)
         if (!teacherSubject) {
-            return NextResponse.json(new ApiError(403, "Teacher not assigned to subject", "Teacher not assigned to subject"));
+            return NextResponse.json(new ApiError(403, "Teacher not assigned to subject", "Teacher is not assigned to this subject"));
         }
 
-        // Create a new schedule attendance and link it to TeacherSubject.
+        // Retrieve students from the batch
+        const students = await prisma.student.findMany({
+            where: { batchId },
+            select: { id: true },
+        });
+
+        if (!students.length) {
+            return NextResponse.json(new ApiError(404, "No students found", "No students found in this batch"));
+        }
+
+        // Create schedule attendance with student attendance records
         const schedule = await prisma.scheduleAttendance.create({
             data: {
                 startTime: new Date(startTime),
                 endTime: new Date(endTime),
-
-                TeacherSubject: { connect: { id: teacherSubject.id } }, // Link without overwriting
-                batch: { connect: { id: batchId }}
-           
+                batch: { connect: { id: batchId } },
+                Subject: { connect: { id: subjectId } },
+                Role: {
+                    connect: {
+                        id: teacherId
+                    }
+                },
+                // branch: { connect: { id: branchId } },
+                TeacherSubject: { connect: { id: teacherSubject.id } }, // Connect teacher to schedule
+                Attendance: {
+                    create: students.map(student => ({
+                        status: "NOT_MARKED",
+                        student: { connect: { id: student.id } },
+                        subject: { connect: { id: subjectId } },
+                        batch: { connect: { id: batchId } },
+                    })),
+                },
             },
         });
 

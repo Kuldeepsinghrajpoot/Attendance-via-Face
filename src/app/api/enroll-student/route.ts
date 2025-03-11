@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const { values } = await req.json();
   const { subjectId, session, year, batchId, branchId } = await values;
   // console.log("values", values);
-  if (![subjectId, session, year, batchId, branchId].every((e) => !!e)) {
+  if (![subjectId, session, year, batchId,branchId].every((e) => !!e)) {
     return NextResponse.json(
       new ApiError(400, "Invalid details", "Invalid details")
     );
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
           teacher: { connect: { id: teacherId } },
           subject: { connect: { id: subjectId } },
           // scheduleAttendance: { connect: { id: "someScheduleAttendanceId" } }, // Replace with actual scheduleAttendanceId
-          branch: { connect: { id: branchId } }, // Add the branch connection
+          // branch: { connect: { id: branchId } }, // Add the branch connection
         },
       });
     }
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     const students = await prisma.student.findMany({
       where: {
         batchId,
-        branchId,
+        // branchId,
       },
       select: { id: true, batchId: true },
     });
@@ -111,6 +111,7 @@ export async function POST(req: NextRequest) {
         session,
         year,
         teacherSubjectId: teacherSubject.id,
+        branchId,
       })),
     });
 
@@ -169,6 +170,7 @@ export async function GET(req: NextRequest): Promise<Response> {
       select: {
         session: true,
         year: true,
+        // branchId: true,
         subject: {
           select: {
             id: true,
@@ -179,6 +181,12 @@ export async function GET(req: NextRequest): Promise<Response> {
           select: {
             id: true,
             batch: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            branchName: true,
           },
         },
         teacherSubject: {

@@ -32,6 +32,8 @@ export async function GET(request: NextRequest): Promise<Response> {
                                 currentDate.getDate() + 1
                             ),
                         },
+                        subjectId:"67c579d2875f3ef2663a08ac",
+                        batchId:"67c579d2875f3ef2663a08ac"
                     },
                 },
 

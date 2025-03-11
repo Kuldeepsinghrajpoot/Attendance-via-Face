@@ -124,7 +124,7 @@ export default function CameraCapture({ attendanceData }: any) {
             <DialogTrigger asChild>
                 <Button className="space-x-1" variant="ghost">
                     <User2 />
-                    <span>Login</span>
+                    <span>Mark</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col items-center gap-4 p-4">

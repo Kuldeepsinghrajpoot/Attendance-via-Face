@@ -25,19 +25,21 @@ model Subject {
 }
 
 model Roles {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
-  email          String           @unique
-  password       String
-  role           RoleType
-  firstName      String
-  lastName       String?
-  phone          String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  branch         Branch?          @relation(fields: [branchId], references: [id])
-  branchId       String?          @db.ObjectId
-  Subject        Subject[]
-  TeacherSubject TeacherSubject[]
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  email                String              @unique
+  password             String
+  role                 RoleType
+  firstName            String
+  lastName             String?
+  phone                String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  branch               Branch?             @relation(fields: [branchId], references: [id])
+  branchId             String?             @db.ObjectId
+  Subject              Subject[]
+  TeacherSubject       TeacherSubject[]
+  ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  scheduleAttendanceId String?             @db.ObjectId
 }
 
 model TeacherSubject {
@@ -63,6 +65,7 @@ model Batch {
   updatedAt            DateTime            @updatedAt
   ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
+  Attendance           Attendance[]
 }
 
 model Branch {
@@ -75,6 +78,7 @@ model Branch {
   students             Student[]           @relation("StudentToBranch")
   ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
+  Enroll               Enroll[]
 }
 
 model Student {
@@ -114,6 +118,11 @@ model Enroll {
   year             String
   teacherSubject   TeacherSubject? @relation(fields: [teacherSubjectId], references: [id])
   teacherSubjectId String?         @db.ObjectId
+  branch           Branch?         @relation(fields: [branchId], references: [id])
+  branchId         String?         @db.ObjectId
+
+  @@index([session])
+  @@index([year])
 }
 
 model ScheduleAttendance {
@@ -122,6 +131,7 @@ model ScheduleAttendance {
   endTime        DateTime?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+  Role           Roles[]
   Subject        Subject[]
   Attendance     Attendance[]
   TeacherSubject TeacherSubject[]
@@ -140,6 +150,8 @@ model Attendance {
   status             AttendanceValue
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  batch              Batch ?              @relation(fields: [batchId], references: [id])
+  batchId            String   ?           @db.ObjectId
 }
 
 enum RoleType {

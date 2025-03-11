@@ -1,150 +1,94 @@
 "use client";
 
-import * as React from "react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+} from "recharts";
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart";
+import React from "react";
 
-export const description = "An interactive bar chart";
+interface Stats {
+    present: number;
+    absent: number;
+}
 
-const chartData = [
-    { date: "2024-04-01", desktop: 222, mobile: 150 },
-    { date: "2024-04-02", desktop: 97, mobile: 180 },
-    { date: "2024-06-15", desktop: 307, mobile: 350 },
-    { date: "2024-06-16", desktop: 371, mobile: 310 },
-    { date: "2024-06-17", desktop: 475, mobile: 520 },
-    { date: "2024-06-18", desktop: 107, mobile: 170 },
-    { date: "2024-06-19", desktop: 341, mobile: 290 },
-    { date: "2024-06-20", desktop: 408, mobile: 450 },
+export default function AttendanceChart({
+    data,
+}: {
+    data: { attendanceRecord: Record<string, Record<string, Stats>> };
+}) {
+    const attendance = data?.attendanceRecord;
+    //   present: stats?.present || 0,
+    // Convert API data to an array format for the chart
+    const chartData = React.useMemo(() => {
+        return Object.entries(attendance || {}).flatMap(([subject, batches]) =>
+            Object.entries(batches).map(([batch, stats]) => ({
+                subject: `${subject} (Batch ${batch})`,
+                present: stats.present || 0,
+                absent: stats.absent || 0,
+            }))
+        );
+    }, [attendance]);
 
-    { date: "2024-06-27", desktop: 448, mobile: 490 },
-    { date: "2024-06-28", desktop: 149, mobile: 200 },
-    { date: "2024-06-29", desktop: 103, mobile: 160 },
-    { date: "2024-06-30", desktop: 446, mobile: 400 },
-];
 
-const chartConfig = {
-    views: {
-        label: "Page Views",
-    },
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
-    },
-    mobile: {
-        label: "Mobile",
-        color: "hsl(var(--chart-2))",
-    },
-} satisfies ChartConfig;
 
-export function Chart() {
-    const [activeChart, setActiveChart] =
-        React.useState<keyof typeof chartConfig>("desktop");
-
-    const total = React.useMemo(
-        () => ({
-            desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-            mobile: chartData.reduce((acc, curr) => acc + curr.mobile, 0),
-        }),
-        []
-    );
-
+    // console.log("Chart Data:", chartData);
     return (
-        <Card className="">
-            <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-                <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-                    <CardTitle>Bar Chart - Interactive</CardTitle>
-                    <CardDescription>
-                        Showing total visitors for the last 3 months
-                    </CardDescription>
-                </div>
-                <div className="flex">
-                    {["desktop", "mobile"].map((key) => {
-                        const chart = key as keyof typeof chartConfig;
-                        return (
-                            <button
-                                key={chart}
-                                data-active={activeChart === chart}
-                                className=" flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                                onClick={() => setActiveChart(chart)}
-                            >
-                                <span className="text-xs text-muted-foreground">
-                                    {chartConfig[chart].label}
-                                </span>
-                                <span className="text-lg font-bold leading-none sm:text-3xl">
-                                    {total[
-                                        key as keyof typeof total
-                                    ].toLocaleString()}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
+        <Card>
+            <CardHeader>
+                <CardTitle>Attendance Overview</CardTitle>
+                <CardDescription>
+                    Showing attendance data for different subjects and batches
+                </CardDescription>
             </CardHeader>
-            <CardContent className="px-2 sm:p-6">
-                <ChartContainer
-                    config={chartConfig}
-                    className="aspect-auto h-[250px] w-full"
-                >
+            <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
                     <BarChart
-                        accessibilityLayer
                         data={chartData}
-                        margin={{
-                            left: 12,
-                            right: 12,
-                        }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
-                        <CartesianGrid vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
-                            dataKey="date"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            minTickGap={32}
-                            tickFormatter={(value) => {
-                                const date = new Date(value);
-                                return date.toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                });
-                            }}
+                            dataKey="subject"
+                            tick={{ fontSize: 12 }}
+                            angle={-15}
+                            textAnchor="end"
                         />
-                        <ChartTooltip
-                            content={
-                                <ChartTooltipContent
-                                    className="w-[150px]"
-                                    nameKey="views"
-                                    labelFormatter={(value) => {
-                                        return new Date(
-                                            value
-                                        ).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                            year: "numeric",
-                                        });
-                                    }}
-                                />
-                            }
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar
+                            dataKey="present"
+                            fill="#22C55E"
+                            name="Present Students"
+                            radius={[4, 4, 0, 0]}
                         />
                         <Bar
-                            dataKey={activeChart}
-                            fill={`var(--color-${activeChart})`}
+                            dataKey="absent"
+                            fill="#EF4444"
+                            name="Absent Students"
+                            radius={[4, 4, 0, 0]}
                         />
                     </BarChart>
-                </ChartContainer>
+                </ResponsiveContainer>
             </CardContent>
+            <CardFooter className="flex items-center justify-between text-sm text-muted-foreground">
+                <div>Total Attendance Data</div>
+                <div>Updated: {new Date().toLocaleDateString()}</div>
+            </CardFooter>
         </Card>
     );
 }

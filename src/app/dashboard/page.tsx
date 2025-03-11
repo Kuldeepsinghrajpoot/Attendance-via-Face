@@ -1,81 +1,45 @@
-"use client";
 
-import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
-import CardWithForm from "./dashboard/card";
-import { Chart } from "./dashboard/chart";
+import React from "react";
 import { Calendars } from "./dashboard/calendar";
+import CardWithFormList from "./dashboard/card";
+import AttendanceChart from "./dashboard/chart";
+import { auth } from "../api/auth";
 
-import {
-    BarChart,
-    CheckCircle,
-    User,
-    UserCheck2Icon,
-    ViewIcon,
-} from "lucide-react";
-import PieChartComponent from "./dashboard/pi-chart";
-import axios from "axios";
-import AttendanceTable from "./dashboard/subject-table";
+async function getAttendanceSummary({id,date}:any) {
+    // Fetch attendance summary for a given month and year
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PORT}/api/dashboard?id=${id}&&date=${date}`
+    );
+    const data = await response.json();
+    return data.data;
+}
 
-const cartItem = [
-    { title: "Students", Icon: UserCheck2Icon, data: 500 },
-    { title: "Teachers", Icon: User, data: 50 },
-    { title: "Attendance", Icon: CheckCircle, data: 50 },
-    { title: "Visitor", Icon: ViewIcon, data: 1500 },
-];
+async function page({searchParams}:any) {
+    const res = await auth();
+    const id = res?.id;
+    const {date} = await searchParams;
 
-const Page = () => {
-    const { data: session, status } = useSession();
-    const userId = session?.user?.id;
-    const [dashboardData, setDashboardData] = useState(null);
-
-    useEffect(() => {
-        if (!userId) return;
-
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:3000/api/dashboard?id=${userId}`
-                );
-                setDashboardData(response.data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
-    }, [userId]); // Dependency array fixed
-
-    if (status === "loading") return <div>Loading...</div>;
-    console.log(dashboardData);
+   
+    const dashboardData = await getAttendanceSummary({id,date});
     return (
         <div className="p-4">
             {/* Cards Section */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {cartItem?.map((dataItem, key) => (
-                    <CardWithForm key={key} dataItem={dataItem} />
-                ))}
+            <div>
+                <CardWithFormList />
             </div>
 
             {/* Charts & Calendar Section */}
             <div className="flex flex-wrap justify-center w-full gap-4 mt-6">
                 <div className="flex-1 min-w-[300px] h-full">
-                    <Chart />
+                    <AttendanceChart data={dashboardData} />
                 </div>
                 <div className="h-full">
-                    <Calendars />
+                    <Calendars id={id} />
                 </div>
             </div>
-
-            {/* Subject Table */}
-            <div className="bg-background p-5 my-5 rounded">
-                <AttendanceTable />
-            </div>
-
-            {/* Pie Chart Component */}
-            {dashboardData && <PieChartComponent data={dashboardData} />}
+            {/* <div className="bg-background p-5 my-5 rounded"></div> */}
         </div>
     );
-};
+}
 
-export default Page;
+export default page;
