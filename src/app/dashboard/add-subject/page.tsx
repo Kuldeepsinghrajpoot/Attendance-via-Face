@@ -1,7 +1,6 @@
 import React from 'react'
 import { Subject } from './table'
 import { SubjectForm } from './subject-form'
-import { SelectSubject } from './select-subject'
 
 function page() {
   return (
@@ -10,7 +9,7 @@ function page() {
         <SubjectForm/>
         {/* <SelectSubject/> */}
       </div>
-      <div className='bg-background border rounded-md p-4 my-4'>
+      <div className=' p-4 my-4 items-center justify-center flex flex-col'>
         <Subject/>
       </div>
     </section>

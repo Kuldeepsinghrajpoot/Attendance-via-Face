@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
         data: {
           teacher: { connect: { id: teacherId } },
           subject: { connect: { id: subjectId } },
+          Batch: { connect: { id: batchId } },
+          branch: { connect: { id: branchId } },
           // scheduleAttendance: { connect: { id: "someScheduleAttendanceId" } }, // Replace with actual scheduleAttendanceId
           // branch: { connect: { id: branchId } }, // Add the branch connection
         },

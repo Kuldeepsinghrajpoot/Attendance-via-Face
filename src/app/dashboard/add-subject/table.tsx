@@ -28,19 +28,21 @@ export async function Subject() {
   const res = await fetchSubject({ id });
 
   return (
-    <Table className="w-full ">
+    <div className="overflow-x-auto items-center bg-background rounded-md p-4  ">
+   
+   <Table className=" ">
       <TableHeader>
         <TableRow>
           <TableHead className="text-left font-semibold">Subject ID</TableHead>
-          <TableHead className="text-right font-semibold">Subject Name</TableHead>
+          <TableHead className=" font-semibold">Subject Name</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {res?.data.length > 0 ? (
-          res.data.map((item: { id: string; subjectName: string }) => (
+          res.data.map((item: { id: string; subjectName: string },key:any) => (
             <TableRow key={item.id} className=" ">
               <TableCell className="py-2">{item.id}</TableCell>
-              <TableCell className="py-2 text-right">{item.subjectName}</TableCell>
+              <TableCell className="py-2 ">{item.subjectName}</TableCell>
             </TableRow>
           ))
         ) : (
@@ -52,5 +54,6 @@ export async function Subject() {
         )}
       </TableBody>
     </Table>
+    </div>
   );
 }

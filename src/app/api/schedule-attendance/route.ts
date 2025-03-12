@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
                 endTime: new Date(endTime),
                 batch: { connect: { id: batchId } },
                 Subject: { connect: { id: subjectId } },
+                
                 Role: {
                     connect: {
                         id: teacherId

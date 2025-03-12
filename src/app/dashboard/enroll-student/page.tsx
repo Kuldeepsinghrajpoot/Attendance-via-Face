@@ -26,7 +26,7 @@ async function page() {
                 <SubjectForm data={data}/>
          
             </div>
-            <div className="bg-background border rounded-md p-4 my-4">
+            <div className="items-center justify-center  my-4">
                 <EnrollTable />
             </div>
         </section>

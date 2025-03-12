@@ -3,7 +3,9 @@ import { auth } from "@/app/api/auth";
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -36,44 +38,61 @@ export default async function EnrollTable() {
   const enrollmentList = response.data || [];
   console.log(enrollmentList);
   return (
-    <Table className="w-full">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-left font-semibold">Subject</TableHead>
-          <TableHead className="text-left font-semibold">Session</TableHead>
-          <TableHead className="text-left font-semibold">Year</TableHead>
-          <TableHead className="text-left font-semibold">Batch</TableHead>
-          <TableHead className="text-left font-semibold">Total Students</TableHead>
-          <TableHead className="text-left font-semibold">Details</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {enrollmentList.length > 0 ? (
-          enrollmentList.map((enroll: any, index: number) => (
-            <TableRow key={index}>
-              <TableCell className="py-2">{enroll.subject.subjectName}</TableCell>
-              <TableCell className="py-2">{enroll.session}</TableCell>
-              <TableCell className="py-2">{enroll.year}</TableCell>
-              <TableCell className="py-2">{enroll.batch.batch}</TableCell>
-              <TableCell className="py-2">{enroll.studentCount}</TableCell>
-              <TableCell className="py-2">
+    <div className="overflow-x-auto items-center bg-background rounded-md p-4  ">
+
+      <Table className="w-full">
+        <TableCaption>
+          College Schedule for Attendance Marking (20 min)
+        </TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-left font-semibold">No.</TableHead>
+            <TableHead className="text-left font-semibold">Subject</TableHead>
+            <TableHead className="text-left font-semibold">Session</TableHead>
+            <TableHead className="text-left font-semibold">Year</TableHead>
+            <TableHead className="text-left font-semibold">Batch</TableHead>
+            <TableHead className="text-left font-semibold">Total Students</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {enrollmentList.length > 0 ? (
+            enrollmentList.map((enroll: any, index: number) => (
+              <TableRow key={index}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell className="py-2">{enroll.subject.subjectName}</TableCell>
+                <TableCell className="py-2">{enroll.session}</TableCell>
+                <TableCell className="py-2">{enroll.year}</TableCell>
+                <TableCell className="py-2">{enroll.batch.batch}</TableCell>
+                <TableCell className="py-2">{enroll.studentCount}</TableCell>
+                {/* <TableCell className="py-2">
                 <Link
                   href={`/dashboard/enroll-student/${enroll.subject.id}/${enroll.session}/${enroll.year}/${enroll.batch.id}`}
                   className="text-blue-500 hover:underline"
                 >
                   View Students
                 </Link>
+              </TableCell> */}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-4">
+                No enrollments found.
               </TableCell>
             </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={6} className="text-center py-4">
-              No enrollments found.
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+          )}
+        </TableBody>
+        <TableFooter>
+                <TableRow>
+                    <TableCell
+                        colSpan={9}
+                        className="text-center font-semibold"
+                    >
+                       showing Enroll student details
+                    </TableCell>
+                </TableRow>
+            </TableFooter>
+      </Table>
+    </div>
   );
 }

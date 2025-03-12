@@ -93,3 +93,4 @@ export async function GET(req: NextRequest): Promise<Response> {
     return NextResponse.json(new ApiError(500, "Something went wrong", error));
   }
 }
+

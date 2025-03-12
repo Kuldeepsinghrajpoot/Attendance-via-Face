@@ -8,17 +8,16 @@ datasource db {
 }
 
 model Subject {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  subjectName String
-  branch      Branch?      @relation(fields: [branchId], references: [id])
-  branchId    String?      @db.ObjectId
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  teacher     Roles?       @relation(fields: [teacherId], references: [id])
-  teacherId   String?      @db.ObjectId
-  Enroll      Enroll[]
-  attendances Attendance[] // Link to daily attendance records
-
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
+  subjectName          String
+  branch               Branch?             @relation(fields: [branchId], references: [id])
+  branchId             String?             @db.ObjectId
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  teacher              Roles?              @relation(fields: [teacherId], references: [id])
+  teacherId            String?             @db.ObjectId
+  Enroll               Enroll[]
+  attendances          Attendance[] // Link to daily attendance records
   ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
   TeacherSubject       TeacherSubject[]
@@ -51,9 +50,13 @@ model TeacherSubject {
   // New relation to schedule attendance for this teacher's assignment to the subject.
   scheduleAttendanceId String?             @db.ObjectId
   scheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
+  BatchId              String?             @db.ObjectId
+  Batch                Batch?              @relation(fields: [BatchId], references: [id])
   assignedAt           DateTime            @default(now())
   createdAt            DateTime            @default(now())
   Enroll               Enroll[]
+  branch               Branch?             @relation(fields: [branchId], references: [id])
+  branchId             String?             @db.ObjectId
 }
 
 model Batch {
@@ -66,6 +69,7 @@ model Batch {
   ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
   Attendance           Attendance[]
+  TeacherSubject       TeacherSubject[]
 }
 
 model Branch {
@@ -79,6 +83,7 @@ model Branch {
   ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
   Enroll               Enroll[]
+  TeacherSubject       TeacherSubject[]
 }
 
 model Student {
@@ -150,8 +155,8 @@ model Attendance {
   status             AttendanceValue
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
-  batch              Batch ?              @relation(fields: [batchId], references: [id])
-  batchId            String   ?           @db.ObjectId
+  batch              Batch?              @relation(fields: [batchId], references: [id])
+  batchId            String?             @db.ObjectId
 }
 
 enum RoleType {

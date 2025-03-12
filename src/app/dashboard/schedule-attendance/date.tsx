@@ -39,7 +39,7 @@ export function DateTimePicker24hForm({
 }: {
     initialValues: any;
 }) {
-    
+
     const form = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
         defaultValues: {

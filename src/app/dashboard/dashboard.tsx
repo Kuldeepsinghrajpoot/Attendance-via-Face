@@ -46,13 +46,11 @@ export default function Dashboard({ children }: { children: any }) {
                 href: "/dashboard/attendance",
             },
             {
-                name: "Attendance Record",
-                icon: PlusCircle,
-                href: `/dashboard/record?date=${format(
-                    new Date(),
-                    "MMM-dd-yyyy"
-                )}`,
+                name: "Mark Attendance",
+                icon: CheckCheck,
+                href: "/dashboard/mark-attendace",
             },
+
             { name: "Student", icon: User, href: "/dashboard/student" },
             {
                 name: "Add Subject",
@@ -79,14 +77,22 @@ export default function Dashboard({ children }: { children: any }) {
         []
     );
     // Filter navigation items based on the user's role
-    const filteredNavItems =
-        user?.role?.role === "STUDENT"
-            ? navItems.filter((item) =>
-                  ["Dashboard", "Settings", "Mark Attendance"].includes(
-                      item.name
-                  )
-              )
-            : navItems;
+    // Filter navigation items based on the user's role
+    const filteredNavItems = React.useMemo(() => {
+        if (user?.role?.role === "STUDENT") {
+            return navItems.filter(
+                (item, index) =>
+                    ["Dashboard", "Settings", "Mark Attendance"].includes(item.name) &&
+                    index !== 2 // Hide second "Mark Attendance" for students
+            );
+        } else if (user?.role?.role === "TEACHER") {
+            return navItems.filter(
+                (item, index) => !(item.name === "Mark Attendance" && index === 1) // Hide first "Mark Attendance" for teachers
+            );
+        }
+        return navItems; // Default: Show all items for other roles
+    }, [user?.role?.role]);
+
 
     return (
         <div className="grid min-h-screen relative  z-20 w-full md:grid-cols-[220px_1fr] lg:grid-cols-[220px_1fr] ">
@@ -134,11 +140,10 @@ export default function Dashboard({ children }: { children: any }) {
                                         prefetch={false}
                                         key={index}
                                         href={item.href}
-                                        className={`flex items-center gap-3 rounded px-3 py-2 transition-all hover:text-primary hover:bg-muted ${
-                                            pathname === item.href
+                                        className={`flex items-center gap-3 rounded px-3 py-2 transition-all hover:text-primary hover:bg-muted ${pathname === item.href
                                                 ? "  bg-primary text-white "
                                                 : " "
-                                        }`}
+                                            }`}
                                     >
                                         <item.icon className="h-4 w-4" />
                                         {item.name}
@@ -154,16 +159,15 @@ export default function Dashboard({ children }: { children: any }) {
                                     <Link
                                         key={index}
                                         href={item.href}
-                                        className={`flex items-center gap-3 rounded  px-3 py-2 transition-all hover:text-primary hover:bg-muted ${
-                                          pathname.replace(/\?.*/, "").split("/")[2]===item.href.replace(/\?.*/, "").split("/")[2]
+                                        className={`flex items-center gap-3 rounded  px-3 py-2 transition-all hover:text-primary hover:bg-muted ${pathname.replace(/\?.*/, "").split("/")[2] === item.href.replace(/\?.*/, "").split("/")[2]
                                                 ? "bg-primary text-white"
                                                 : ""
-                                        }`}
+                                            }`}
                                     >
                                         <item.icon className="h-4 w-4" />
                                         <div>
-                                          {item.name}
-                                          
+                                            {item.name}
+
                                         </div>
                                     </Link>
                                 ))}

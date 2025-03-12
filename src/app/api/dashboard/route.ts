@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Fetch attendance summary for the given day
-    const attendanceRecord = await getAttendanceSummary(startDate);
+    const attendanceRecord = await getAttendanceSummary(startDate, id);
     // If no data found, return 404
     if (schedules.length === 0 && attendances.length === 0) {
       return NextResponse.json(
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
 }
 
 // 🔹 Fetch attendance summary for a specific day
-const getAttendanceSummary = async (date: Date) => {
+const getAttendanceSummary = async (date: Date, id: any) => {
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
   const endOfDay = new Date(date);
@@ -120,7 +120,12 @@ const getAttendanceSummary = async (date: Date) => {
           gte: startOfDay,
           lte: endOfDay,
         },
-       
+
+        Role: {
+          some: {
+            id, // Filter by teacher ID
+          }
+        },
       },
     },
     include: {

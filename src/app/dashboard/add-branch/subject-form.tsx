@@ -11,11 +11,8 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { User2 } from "lucide-react";
 import Swal from "sweetalert2";
@@ -27,9 +24,9 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import React, { useEffect, useState } from "react";
-import { roleSchema, RoleSchema } from "@/schema/role-schema";
+import React, { useState } from "react";
 import axios from "axios";
+import { addBatch, AddBatch } from "@/schema/add-batch";
 
 
 export function SubjectForm() {
@@ -39,14 +36,14 @@ export function SubjectForm() {
 
     // Redirect to dashboard if user is logged in
 
-    const form = useForm<RoleSchema>({
-        resolver: zodResolver(roleSchema),
+    const form = useForm<AddBatch>({
+        resolver: zodResolver(addBatch),
         defaultValues: {
-            email: "", role: "", password: "", firstName: "", phone: "", lastName: ""
+            batch: ""
         },
     });
 
-    const onSubmit: SubmitHandler<RoleSchema> = React.useCallback(
+    const onSubmit: SubmitHandler<AddBatch> = React.useCallback(
         async (values) => {
             console.log(values);
             Swal.fire({
@@ -59,7 +56,7 @@ export function SubjectForm() {
 
             try {
                 const res = await axios.post(
-                    `${process.env.NEXT_PUBLIC_PORT}/api/role?id=${session?.user?.id}`,
+                    `${process.env.NEXT_PUBLIC_PORT}/api/batch?id=${session?.user?.id}`,
                     {
                         values,
                     },
@@ -76,7 +73,7 @@ export function SubjectForm() {
                     Swal.fire({
                         icon: "success",
                         title: "Success!",
-                        text: "Account is created successfully",
+                        text: "Batch added successfully",
                         timer: 2000,
                         showConfirmButton: false,
                     });
@@ -89,13 +86,12 @@ export function SubjectForm() {
 
                     Swal.fire({
                         icon: "error",
-                        title: "Account creation Failed",
+                        title: "Batch creation Failed",
                         text: "You are not authorize",
                         confirmButtonColor: "red",
                     });
                 }
             } catch (error) {
-                console.error("account creation Error:", error);
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
@@ -117,111 +113,41 @@ export function SubjectForm() {
             <DialogTrigger asChild>
                 <Button className="space-x-1" variant="secondary">
                     <User2 />
-                    <span>Add Role</span>
+                    <span>Add new batch</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[625px]">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle className="text-center text-xl font-semibold">
-                        Add new Role
+                        Add new batch
                     </DialogTitle>
                     <DialogDescription className="text-center text-gray-500">
-                        Signup in to new account to continue.
+                        Fill the form to add new branch
                     </DialogDescription>
                 </DialogHeader>
                 <FormProvider {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                        <div className="grid gap-4 grid-cols-2 py-4">
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="firstName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="lastName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="role"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
-                                        </FormControl>
-                                        <FormDescription>This is your public display name.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
 
-                        <DialogFooter className="w-full ">
+                        <FormField
+                            control={form.control}
+                            name="batch"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Batch</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="batch" {...field} />
+                                    </FormControl>
+                                    <FormDescription>This is your public display name.</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+
+                        <DialogFooter className=" ">
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className=""
                                 variant="default"
                             >
                                 Login
