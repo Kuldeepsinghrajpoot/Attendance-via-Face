@@ -39,7 +39,7 @@ import { useRouter } from "next/navigation";
 export function SubjectForm({ data }: { data: any }) {
     const { data: session, status } = useSession();
     const [dialogOpen, setDialogOpen] = useState(false);
-const router = useRouter();
+    const router = useRouter();
     if (status === "loading") return <div>Loading...</div>;
 
     // Initialize react-hook-form with zodResolver
@@ -74,6 +74,7 @@ const router = useRouter();
                 );
                 Swal.close();
                 if (res.data.status === 200) {
+                    router.refresh();
                     Swal.fire({
                         icon: "success",
                         title: "Success!",
@@ -82,10 +83,7 @@ const router = useRouter();
                         showConfirmButton: false,
                     });
                     setDialogOpen(false);
-                    form.reset();
-                    setInterval(() => {
-                        router.refresh()
-                    },1000)
+                    
                 } else {
                     setDialogOpen(false);
                     form.reset();
@@ -143,7 +141,10 @@ const router = useRouter();
                                     <FormItem>
                                         <FormLabel>Branch</FormLabel>
                                         <FormControl>
-                                            <Select  onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a Branch" />
                                                 </SelectTrigger>
@@ -183,7 +184,10 @@ const router = useRouter();
                                     <FormItem>
                                         <FormLabel>Batch</FormLabel>
                                         <FormControl>
-                                            <Select  onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select Branch" />
                                                 </SelectTrigger>
@@ -223,7 +227,10 @@ const router = useRouter();
                                     <FormItem>
                                         <FormLabel>Select Subject</FormLabel>
                                         <FormControl>
-                                            <Select  onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select Subject" />
                                                 </SelectTrigger>

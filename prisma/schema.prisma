@@ -142,6 +142,13 @@ model ScheduleAttendance {
   TeacherSubject TeacherSubject[]
   batch          Batch[]
   branch         Branch[]
+
+  teacherId        String
+  batchId          String
+  subjectId        String
+  teacherSubjectId String
+
+  @@index([teacherId, batchId, subjectId, startTime]) // Index for fast lookup
 }
 
 model Attendance {

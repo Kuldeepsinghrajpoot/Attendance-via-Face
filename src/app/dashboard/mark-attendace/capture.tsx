@@ -92,7 +92,7 @@ export default function CameraCapture({ attendanceData }: any) {
     const markAttendance = async (name: string) => {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_PORT}/api/attendance?id=${id}`,
+                `${process.env.NEXT_PUBLIC_PORT}/api/mark-attendance-by-teacher?id=${id}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

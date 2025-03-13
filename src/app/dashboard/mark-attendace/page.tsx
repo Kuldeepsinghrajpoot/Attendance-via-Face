@@ -15,9 +15,10 @@ async function getData({ id }: { id: string }) {
 async function Mark() {
     const res = await auth()
     const id = res?.role?.id;
-const role = res?.role?.role
+    const role = res?.role?.role
 
     const response = await getData({ id });
+    console.log(response)
     return (
         <div className='bg-background rounded'>
             <AttendanceTable attendanceData={response} role={role} />

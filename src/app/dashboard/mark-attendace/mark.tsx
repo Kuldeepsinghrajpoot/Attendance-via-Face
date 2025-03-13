@@ -181,7 +181,7 @@ const AttendanceTable = ({ attendanceData, role }: Props) => {
                                     <CameraCapture
                                         attendanceData={{
                                             id: student.id,
-                                            subjectId: student.subject,
+                                            subjectId: student.subjectId,
                                             role: role
                                         }}
                                         disabled={false}

@@ -67,7 +67,7 @@ export function SubjectForm() {
                         },
                     }
                 );
-                console.log(res)
+              
                 Swal.close();
                 const response = res;
                 if (response?.data?.status === 200) {

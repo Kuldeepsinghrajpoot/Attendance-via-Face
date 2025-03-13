@@ -33,12 +33,15 @@ import {
 import { formSchema, FormSchema } from "@/schema/schedule-time";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import Swal from "sweetalert2";
+import { useState } from "react";
 
 export function DateTimePicker24hForm({
     initialValues,
 }: {
     initialValues: any;
 }) {
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const form = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
@@ -52,6 +55,13 @@ export function DateTimePicker24hForm({
     const id = session?.user?.id;
 
     const onSubmit: SubmitHandler<FormSchema> = async (data) => {
+        Swal.fire({
+            title: "Creating account",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => Swal.showLoading(),
+        });
         const duration = differenceInMinutes(data.endTime, data.startTime);
         if (duration < 0) {
             toast.error("End time must be after start time.");
@@ -71,18 +81,34 @@ export function DateTimePicker24hForm({
                 { timeout: 5000 }
             );
             console.log(res);
-            if (res?.data?.status !== 200) {
-                toast.error("Error while scheduling attendance.");
-                return 0;
+            if (res?.data?.status === 200) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: " Schedule attendance is added successfully",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+
+                setDialogOpen(false);
+                form.reset();
+            } else {
+                form.reset();
+                setDialogOpen(false);
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Schedule attendance is added Failed",
+                    text: "You are not authorize",
+                    confirmButtonColor: "red",
+                });
             }
-            toast.success(
-                `Start: ${format(data.startTime, "PPPP HH:mm")}, End: ${format(
-                    data.endTime,
-                    "PPPP HH:mm"
-                )}, Duration: ${duration} minutes`
-            );
         } catch (error) {
-            toast.error("Error while scheduling attendance.");
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong. Please try again!",
+            });
         }
     };
 
