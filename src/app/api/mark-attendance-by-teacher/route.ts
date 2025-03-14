@@ -7,7 +7,11 @@ import { ObjectId } from "bson";
 const prisma = new PrismaClient();
 
 // ✅ Function to check if attendance is already marked for the student today
-async function getAttendanceForDate(studentId: string, subjectId: string, date: Date): Promise<Attendance | null> {
+async function getAttendanceForDate(
+    studentId: string,
+    subjectId: string,
+    date: Date
+): Promise<Attendance | null> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
@@ -26,12 +30,17 @@ export async function POST(req: NextRequest): Promise<Response> {
     try {
         // ✅ Get `id` from request query
         const id = req.nextUrl.searchParams.get("id");
-        if (!id) return NextResponse.json(new ApiError(400, "Bad Request", "ID not provided"));
+        if (!id)
+            return NextResponse.json(
+                new ApiError(400, "Bad Request", "ID not provided")
+            );
 
         // ✅ Extract request body
         const { avatar, subjectId, id: studentId, role } = await req.json();
         if (!avatar || !subjectId || !studentId)
-            return NextResponse.json(new ApiError(400, "Bad Request", "Missing required parameters"));
+            return NextResponse.json(
+                new ApiError(400, "Bad Request", "Missing required parameters")
+            );
 
         // ✅ If role is "teacher", do not mark attendance
         if (role === "TEACHER") {
@@ -39,15 +48,37 @@ export async function POST(req: NextRequest): Promise<Response> {
             // ✅ Find student by avatar and ID
             const user = await prisma.student.findFirst({
                 where: { avatar: `${avatar}.jpeg`, id: studentId },
-                select: { id: true, Firstname: true, lastname: true, rollNumber: true, batchId: true, role: true, phone: true, branchId: true },
+                select: {
+                    id: true,
+                    Firstname: true,
+                    lastname: true,
+                    rollNumber: true,
+                    batchId: true,
+                    role: true,
+                    phone: true,
+                    branchId: true,
+                },
             });
 
-            if (!user) return NextResponse.json(new ApiError(404, "Not Found", "Student not found"));
+            if (!user)
+                return NextResponse.json(
+                    new ApiError(404, "Not Found", "Student not found")
+                );
 
             // ✅ Check if the student already marked attendance today
-            const attendanceForToday = await getAttendanceForDate(user.id, subjectId, new Date());
+            const attendanceForToday = await getAttendanceForDate(
+                user.id,
+                subjectId,
+                new Date()
+            );
             if (attendanceForToday) {
-                return NextResponse.json(new ApiResponse({ status: 200, data: {}, message: "Attendance already marked" }));
+                return NextResponse.json(
+                    new ApiResponse({
+                        status: 200,
+                        data: {},
+                        message: "Attendance already marked",
+                    })
+                );
             }
 
             // ✅ Mark attendance
@@ -59,43 +90,45 @@ export async function POST(req: NextRequest): Promise<Response> {
                     batchId: user.batchId,
                 },
             });
-            return NextResponse.json(new ApiResponse({ status: 200, data: {}, message: "Attendance marked successfully" }));
+            return NextResponse.json(
+                new ApiResponse({
+                    status: 200,
+                    data: {},
+                    message: "Attendance marked successfully",
+                })
+            );
         }
-        
-        return NextResponse.json(new ApiError(403, "Forbidden", "Only teachers can mark student attendance"));
 
+        return NextResponse.json(
+            new ApiError(
+                403,
+                "Forbidden",
+                "Only teachers can mark student attendance"
+            )
+        );
     } catch (error) {
         console.error("Error:", error);
-        return NextResponse.json(new ApiError(500, "Internal Server Error", "Failed to mark attendance"));
+        return NextResponse.json(
+            new ApiError(
+                500,
+                "Internal Server Error",
+                "Failed to mark attendance"
+            )
+        );
     }
 }
 
 export async function GET(req: NextRequest): Promise<Response> {
     try {
+        // Get teacher id from query string and validate it
         const teacherId = req?.nextUrl?.searchParams?.get("id");
-
         if (!teacherId || !ObjectId.isValid(teacherId)) {
-            return NextResponse.json(new ApiError(400, "Invalid or missing teacherId"));
+            return NextResponse.json(
+                new ApiError(400, "Invalid or missing teacherId")
+            );
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-
-        // ✅ Step 1: Find today's attendance schedule
-        const schedule = await prisma.scheduleAttendance.findFirst({
-            where: {
-                teacherId,
-                startTime: { gte: today, lt: tomorrow },
-            },
-        });
-
-        if (!schedule) {
-            return NextResponse.json(new ApiError(404, "No attendance schedule found for today"));
-        }
-
-        // ✅ Step 2: Find assigned subjects and batches
+        // Step 1: Find teacher assigned subjects and batches
         const teacherSubjects = await prisma.teacherSubject.findMany({
             where: { teacherId },
             select: {
@@ -103,15 +136,17 @@ export async function GET(req: NextRequest): Promise<Response> {
                 BatchId: true,
             },
         });
-
         if (!teacherSubjects.length) {
-            return NextResponse.json(new ApiError(404, "No assigned batches or subjects found"));
+            return NextResponse.json(
+                new ApiError(404, "No assigned batches or subjects found")
+            );
         }
-
-        const batchIds = teacherSubjects.map((ts) => ts.BatchId).filter((id) => id !== null);
+        const batchIds = teacherSubjects
+            .map((ts) => ts.BatchId)
+            .filter((id) => id !== null);
         const subjectIds = teacherSubjects.map((ts) => ts.subjectId);
 
-        // ✅ Step 3: Fetch student details
+        // Step 2: Fetch students for those batches along with enrollment info
         const students = await prisma.student.findMany({
             where: { batchId: { in: batchIds } },
             select: {
@@ -129,79 +164,75 @@ export async function GET(req: NextRequest): Promise<Response> {
                         subject: { select: { id: true, subjectName: true } },
                     },
                 },
-                Attendance: {
-                    where: { scheduleId: schedule.id },
-                    select: {
-                        id: true,
-                        status: true,
-                        subjectId: true,
-                    },
-                },
             },
         });
-
         if (!students.length) {
-            return NextResponse.json(new ApiError(404, "No students found for the given teacher"));
+            return NextResponse.json(
+                new ApiError(404, "No students found for the given teacher")
+            );
         }
 
-        // ✅ Step 4: Count how many times attendance has been scheduled for each student
-        const attendanceCount = await prisma.attendance.groupBy({
+        // Step 3: Get overall attendance counts for each student per subject.
+        // Here we assume attendance records have status "PRESENT" and "ABSENT".
+        // Adjust the filters if you use different status values.
+        const presentCounts = await prisma.attendance.groupBy({
             by: ["studentId", "subjectId"],
-            _count: {
-                id: true,
+            where: {
+                status: "PRESENT",
+                subjectId: { in: subjectIds },
             },
+            _count: { id: true },
         });
 
-        // ✅ Step 5: Grouping attendance by batch, subject, and student
+        const absentCounts = await prisma.attendance.groupBy({
+            by: ["studentId", "subjectId"],
+            where: {
+                status: "NOT_MARKED",
+                subjectId: { in: subjectIds },
+            },
+            _count: { id: true },
+        });
+
+        // Step 4: Build a summary grouped by subject for each student.
+        // The key is a combination of batch, branch, and subject.
         const attendanceSummary: Record<string, any> = {};
 
         students.forEach((student) => {
+            // For each enrollment record (each subject the student is enrolled in)
             student.Enroll.forEach((enrollment) => {
                 const key = `${enrollment.batch.batch}-${student.branch.branchName}-${enrollment.subject.subjectName}`;
-
                 if (!attendanceSummary[key]) {
                     attendanceSummary[key] = {
                         batch: enrollment.batch.batch,
                         branch: student.branch.branchName,
                         subject: enrollment.subject.subjectName,
                         subjectId: enrollment.subject.id,
-                        totalPresent: 0,
-                        totalAbsent: 0,
                         students: [],
                     };
                 }
 
-                // ✅ Find the student's attendance count for the subject
-                const studentAttendanceCount = attendanceCount.find(
-                    (count) =>
-                        count.studentId === student.id &&
-                        count.subjectId === enrollment.subject.id
+                // Get the count of present and absent records for this student in this subject
+                const presentRecord = presentCounts.find(
+                    (record) =>
+                        record.studentId === student.id &&
+                        record.subjectId === enrollment.subject.id
+                );
+                const absentRecord = absentCounts.find(
+                    (record) =>
+                        record.studentId === student.id &&
+                        record.subjectId === enrollment.subject.id
                 );
 
-                const totalSchedules = studentAttendanceCount?._count?.id || 0;
+                const totalPresent = presentRecord?._count?.id || 0;
+                const totalAbsent = absentRecord?._count?.id || 0;
 
-                // ✅ Determine attendance status
-                let status = "NOT_MARKED";
-                student.Attendance.forEach((att) => {
-                    if (att.subjectId === enrollment.subject.id) {
-                        status = att.status;
-                    }
-                });
-
-                if (status === "PRESENT") {
-                    attendanceSummary[key].totalPresent += 1;
-                } else if (status === "NOT_MARKED") {
-                    attendanceSummary[key].totalAbsent += 1;
-                }
-
-                // ✅ Push student data
                 attendanceSummary[key].students.push({
                     id: student.id,
                     name: `${student.Firstname} ${student.lastname}`,
                     rollNumber: student.rollNumber,
                     email: student.email,
-                    status,
-                    totalAttendanceScheduled: totalSchedules,
+                    totalPresent,
+                    totalAbsent,
                 });
             });
         });
@@ -214,7 +245,8 @@ export async function GET(req: NextRequest): Promise<Response> {
         );
     } catch (error) {
         console.error("Database Error:", error);
-        return NextResponse.json(new ApiError(500, "Something went wrong", error));
+        return NextResponse.json(
+            new ApiError(500, "Something went wrong", error)
+        );
     }
 }
-

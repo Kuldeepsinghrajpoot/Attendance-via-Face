@@ -37,6 +37,8 @@ type AttendanceData = {
         id: string;
         name: string;
         rollNumber: string;
+        totalPresent: number;
+        totalAbsent: number;
     }[];
     totalPresent: number;
     totalAbsent: number;
@@ -52,7 +54,7 @@ const AttendanceTable = ({ attendanceData, role }: Props) => {
     const [subjectFilter, setSubjectFilter] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-
+console.log(attendanceData);
     // ✅ Debounce search input (waits 300ms before updating search)
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -69,17 +71,17 @@ const AttendanceTable = ({ attendanceData, role }: Props) => {
         attendanceData.forEach((record) => {
             record.students.forEach((student) => {
                 const key = `${student.rollNumber}-${record.batch}-${record.subject}`;
-
+                // console.log(student?.totalAbsent);
                 if (!studentMap.has(key)) {
                     studentMap.set(key, {
                         id: student?.id,
-                        studentName: student.name,
-                        rollNumber: student.rollNumber,
-                        batch: record.batch,
-                        subject: record.subject,
-                        totalPresent: record.totalPresent,
-                        totalAbsent: record.totalAbsent,
-                        subjectId: record.subjectId
+                        studentName: student?.name,
+                        rollNumber: student?.rollNumber,
+                        batch: record?.batch,
+                        subject: record?.subject,
+                        totalPresent: student?.totalPresent,
+                        totalAbsent: student?.totalAbsent,
+                        subjectId: record?.subjectId,
                     });
                 }
             });
@@ -93,10 +95,15 @@ const AttendanceTable = ({ attendanceData, role }: Props) => {
         return groupedData.filter(
             (student) =>
                 (batchFilter === "all" || student.batch === batchFilter) &&
-                (subjectFilter === "all" || student.subject === subjectFilter) &&
+                (subjectFilter === "all" ||
+                    student.subject === subjectFilter) &&
                 (debouncedSearch === "" ||
-                    student.studentName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-                    student.rollNumber.toLowerCase().includes(debouncedSearch.toLowerCase()))
+                    student.studentName
+                        .toLowerCase()
+                        .includes(debouncedSearch.toLowerCase()) ||
+                    student.rollNumber
+                        .toLowerCase()
+                        .includes(debouncedSearch.toLowerCase()))
         );
     }, [groupedData, batchFilter, subjectFilter, debouncedSearch]);
 
@@ -162,8 +169,9 @@ const AttendanceTable = ({ attendanceData, role }: Props) => {
                         <TableHead>Roll Number</TableHead>
                         <TableHead>Batch</TableHead>
                         <TableHead>Subject</TableHead>
-                        <TableHead>Total Present</TableHead>
-                        <TableHead>Total Absent</TableHead>
+                        <TableHead>Present</TableHead>
+                        <TableHead>Absent</TableHead>
+                        <TableHead>Total</TableHead>
                         <TableHead>Mark</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -171,18 +179,21 @@ const AttendanceTable = ({ attendanceData, role }: Props) => {
                     {filteredData.length > 0 ? (
                         filteredData.map((student, index) => (
                             <TableRow key={index}>
-                                <TableCell>{student.studentName}</TableCell>
-                                <TableCell>{student.rollNumber}</TableCell>
-                                <TableCell>{student.batch}</TableCell>
-                                <TableCell>{student.subject}</TableCell>
-                                <TableCell>{student.totalPresent}</TableCell>
-                                <TableCell>{student.totalAbsent}</TableCell>
+                                <TableCell>{student?.studentName}</TableCell>
+                                <TableCell>{student?.rollNumber}</TableCell>
+                                <TableCell>{student?.batch}</TableCell>
+                                <TableCell>{student?.subject}</TableCell>
+                                <TableCell>{student?.totalPresent}</TableCell>
+                                <TableCell>{student?.totalAbsent}</TableCell>
+                                <TableCell>
+                                    {student.totalAbsent + student.totalPresent}
+                                </TableCell>
                                 <TableCell>
                                     <CameraCapture
                                         attendanceData={{
                                             id: student.id,
                                             subjectId: student.subjectId,
-                                            role: role
+                                            role: role,
                                         }}
                                         disabled={false}
                                     />

@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   // Get the teacher id from the URL query parameters.
   const teacherId = req.nextUrl.searchParams.get("id") ?? "";
+  console.log("teacherId", teacherId);
   if (!teacherId && !ObjectId.isValid(teacherId)) {
     return NextResponse.json(
       new ApiError(401, "User not authorized", "User not authorized")
