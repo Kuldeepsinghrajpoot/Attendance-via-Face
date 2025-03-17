@@ -17,7 +17,7 @@ async function getAttendanceForDate(studentId: string, subjectId: string, date: 
       studentId,
       subjectId,
       createdAt: { gte: startOfDay, lt: endOfDay },
-      status: "PRESENT",
+      status: "NOT_MARKED",
     },
   });
 }
@@ -57,11 +57,17 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     // ✅ Check if attendance already marked
     const attendanceForToday = await getAttendanceForDate(user.id, subjectId, new Date());
-    if (attendanceForToday)
+    if (!attendanceForToday)
       return NextResponse.json(new ApiResponse({ status: 200, data: {}, message: "Attendance already marked" }));
 
     // ✅ Mark attendance for today's schedule
-    await prisma.attendance.create({
+    await prisma.attendance.update({
+      where: {
+        id: attendanceForToday.id,
+        studentId: user.id,
+        subjectId,
+        scheduleId: schedule.id,
+      },
       data: {
         studentId: user.id,
         subjectId,

@@ -22,6 +22,7 @@ async function getAttendanceForDate(
             studentId,
             subjectId,
             createdAt: { gte: startOfDay, lt: endOfDay },
+            status: "NOT_MARKED",
         },
     });
 }
@@ -67,11 +68,12 @@ export async function POST(req: NextRequest): Promise<Response> {
 
             // ✅ Check if the student already marked attendance today
             const attendanceForToday = await getAttendanceForDate(
-                user.id,
+                // user.id,
+                studentId,
                 subjectId,
                 new Date()
             );
-            if (attendanceForToday) {
+            if (!attendanceForToday) {
                 return NextResponse.json(
                     new ApiResponse({
                         status: 200,
@@ -82,7 +84,14 @@ export async function POST(req: NextRequest): Promise<Response> {
             }
 
             // ✅ Mark attendance
-            await prisma.attendance.create({
+            const res = await prisma.attendance.update({
+                where: {
+                    // id: user.id,
+                    id: attendanceForToday.id,
+                    studentId: studentId,
+                    subjectId: subjectId,
+                    // subjectId
+                },
                 data: {
                     studentId: user.id,
                     subjectId,
@@ -90,6 +99,16 @@ export async function POST(req: NextRequest): Promise<Response> {
                     batchId: user.batchId,
                 },
             });
+            if (res) {
+
+                return NextResponse.json(
+                    new ApiResponse({
+                        status: 200,
+                        data: {},
+                        message: "Attendance marked successfully",
+                    })
+                );
+            }
             return NextResponse.json(
                 new ApiResponse({
                     status: 200,
@@ -237,6 +256,7 @@ export async function GET(req: NextRequest): Promise<Response> {
             });
         });
 
+        // console.log(Object.values(attendanceSummary));
         return NextResponse.json(
             new ApiResponse({
                 status: 200,

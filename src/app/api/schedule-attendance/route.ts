@@ -40,13 +40,15 @@ export async function POST(req: NextRequest) {
         if (!teacherSubject) {
             return NextResponse.json(new ApiError(403, "Teacher not assigned to subject", "Teacher is not assigned to this subject"));
         }
+        console.log("Teacher subject:", teacherSubject);
 
         // Check if attendance is already scheduled for the same day
         const existingSchedule = await prisma.scheduleAttendance.findFirst({
             where: {
-                teacherSubjectId: teacherSubject.id,
+                // teacherSubjectId: teacherSubject.id,
                 batchId: batchId,
                 subjectId: subjectId,
+                teacherId: teacherId,
                 startTime: {
                     gte: new Date(new Date(startTime).setHours(0, 0, 0, 0)),
                     lte: new Date(new Date(startTime).setHours(23, 59, 59, 999))
@@ -54,13 +56,19 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // console.log("Existing schedule:", existingSchedule);
         if (existingSchedule) {
             // If schedule exists, update only endTime
             const updatedSchedule = await prisma.scheduleAttendance.update({
                 where: { id: existingSchedule.id },
                 data: { endTime: new Date(endTime) }
             });
-            return NextResponse.json(new ApiResponse({ status: 200, data: updatedSchedule }));
+            if(updatedSchedule) {
+
+                return NextResponse.json(new ApiResponse({ status: 200, data: "schedule is updated" }));
+            }
+            return NextResponse.json(new ApiError(500, "Internal server error", "Failed to update schedule"));
+
         }
 
         // Retrieve students from the batch
@@ -79,7 +87,7 @@ export async function POST(req: NextRequest) {
                 teacherId,
                 batchId,
                 subjectId,
-                teacherSubjectId: teacherId,
+                teacherSubjectId: teacherSubject.id,
                 startTime: new Date(startTime),
                 endTime: new Date(endTime),
                 batch: { connect: { id: batchId } },

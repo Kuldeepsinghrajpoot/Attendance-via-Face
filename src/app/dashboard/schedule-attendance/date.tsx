@@ -6,6 +6,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { useRouter } from "next/navigation"
 import {
     FormControl,
     FormDescription,
@@ -54,9 +55,10 @@ export function DateTimePicker24hForm({
     const { data: session } = useSession();
     const id = session?.user?.id;
 
+    const Router = useRouter()
     const onSubmit: SubmitHandler<FormSchema> = async (data) => {
         Swal.fire({
-            title: "Creating account",
+            title: "Attendace scheduling",
             text: "Please wait...",
             allowOutsideClick: false,
             showConfirmButton: false,
@@ -72,7 +74,7 @@ export function DateTimePicker24hForm({
             ...data, // Include form values (startTime, endTime)
             duration,
         };
-        console.log(requestData);
+        // console.log(requestData);
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_PORT}/api/schedule-attendance?id=${id}`,
@@ -80,12 +82,13 @@ export function DateTimePicker24hForm({
                 // requestData,
                 { timeout: 5000 }
             );
-            console.log(res);
+            Router.refresh();
+            // console.log(res);
             if (res?.data?.status === 200) {
                 Swal.fire({
                     icon: "success",
                     title: "Success!",
-                    text: " Schedule attendance is added successfully",
+                    text: res?.data?.message,
                     timer: 2000,
                     showConfirmButton: false,
                 });
