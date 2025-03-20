@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
     try {
         const id = req.nextUrl.searchParams.get("id");
+        console.log("id", id);
         const dateParam = req.nextUrl.searchParams.get("date");
 
         if (!id) {
@@ -66,45 +67,38 @@ const getAttendanceSummary = async (date: Date, id: any) => {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const schedule = await prisma.scheduleAttendance.findMany({
+    // Group attendance by subject and batch
+    const scheduleAttendance = await prisma.scheduleAttendance.findMany({
         where: {
             teacherId: id,
-            startTime: {
+            createdAt: {
                 gte: startOfDay,
                 lte: endOfDay,
             },
+
         },
+
         include: {
+            Subject: true,
+            batch: true,
+
             Attendance: {
-                include: {
-                    student: true,
-                },
-            },
-            // scheduleAttendance: { include: { Subject: true, batch: true } },
-        },
-    });
-console.log(schedule)
-    // Group attendance by subject and batch
-    const attendanceRecords = await prisma.attendance.findMany({
-        where: {
-            scheduleAttendance: {
-                startTime: {
-                    gte: startOfDay,
-                    lte: endOfDay,
-                },
-            },
-        },
-        include: {
-            subject: true,
-            scheduleAttendance: { include: { Subject: true, batch: true } },
-            student: {
                 select: {
-                    Firstname: true,
-                    role: true,
-                    batch: { select: { batch: true } },
-                    rollNumber: true,
+                    status: true,
+
+                    student: {
+                        select: {
+                            Firstname: true,
+                            role: true,
+                            batch: { select: { batch: true } },
+                            rollNumber: true,
+                        },
+                    },
+                    // status: true,
+                    subject: true,
                 },
             },
+
         },
     });
 
@@ -114,9 +108,9 @@ console.log(schedule)
         Record<string, { total: number; present: number; absent: number }>
     > = {};
 
-    attendanceRecords.forEach((record) => {
-        const subjectName = record.subject.subjectName;
-        const batchName = record.student.batch.batch;
+    scheduleAttendance.forEach((record) => {
+        const subjectName = record.Attendance[0]?.subject?.subjectName || "Unknown Subject";
+        const batchName = record.Attendance[0]?.student?.batch?.batch || "Unknown Batch";
 
         if (!summary[subjectName]) {
             summary[subjectName] = {};
@@ -130,7 +124,7 @@ console.log(schedule)
         }
 
         summary[subjectName][batchName].total++;
-        if (record.status === "PRESENT") {
+        if (record.Attendance.some(att => att.status === "PRESENT")) {
             summary[subjectName][batchName].present++;
         } else {
             summary[subjectName][batchName].absent++;

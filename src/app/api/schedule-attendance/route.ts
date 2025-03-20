@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
                 where: { id: existingSchedule.id },
                 data: { endTime: new Date(endTime) }
             });
-            if(updatedSchedule) {
+            if (updatedSchedule) {
 
                 return NextResponse.json(new ApiResponse({ status: 200, data: "schedule is updated" }));
             }
@@ -100,6 +100,7 @@ export async function POST(req: NextRequest) {
                         student: { connect: { id: student.id } },
                         subject: { connect: { id: subjectId } },
                         batch: { connect: { id: batchId } },
+                        teacher: { connect: { id: teacherId } },
                     })),
                 },
             },

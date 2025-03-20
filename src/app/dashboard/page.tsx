@@ -13,6 +13,14 @@ async function getAttendanceSummary({id,date}:any) {
     const data = await response.json();
     return data.data;
 }
+async function getDetails({id,date}:any) {
+    // Fetch attendance summary for a given month and year
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PORT}/api/get-subject-branch-batch?id=${id}`
+    );
+    const data = await response.json();
+    return data.data;
+}
 
 async function page({searchParams}:any) {
     const res = await auth();
@@ -21,11 +29,12 @@ async function page({searchParams}:any) {
 
    
     const dashboardData = await getAttendanceSummary({id,date});
+    const getDetail = await getDetails({id,date});
     return (
         <div className="p-4">
             {/* Cards Section */}
             <div>
-                <CardWithFormList />
+                <CardWithFormList data={getDetail} />
             </div>
 
             {/* Charts & Calendar Section */}

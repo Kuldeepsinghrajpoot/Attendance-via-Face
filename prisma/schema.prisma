@@ -39,6 +39,7 @@ model Roles {
   TeacherSubject       TeacherSubject[]
   ScheduleAttendance   ScheduleAttendance? @relation(fields: [scheduleAttendanceId], references: [id])
   scheduleAttendanceId String?             @db.ObjectId
+  Attendance           Attendance[]
 }
 
 model TeacherSubject {
@@ -164,6 +165,8 @@ model Attendance {
   updatedAt          DateTime            @updatedAt
   batch              Batch?              @relation(fields: [batchId], references: [id])
   batchId            String?             @db.ObjectId
+  teacher            Roles?              @relation(fields: [teacherId], references: [id])
+  teacherId          String?             @db.ObjectId
 }
 
 enum RoleType {

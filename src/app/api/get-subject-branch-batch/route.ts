@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const [branch,batch, subject] = await Promise.all([
+        const [branch, batch, subject] = await Promise.all([
             // get branch
             await prisma.branch.findMany({
                 select: {
@@ -37,17 +37,28 @@ export async function GET(req: NextRequest) {
             }),
         ])
 
-        const [batchCount, branchCount, subjectCount] = await Promise.all([
+        const [batchCount, branchCount, subjectCount, student, role, attendance] = await Promise.all([
             // get branch
             await prisma.branch.count({}),
             // get batch
             await prisma.batch.count({}),
             // get subject
             await prisma.subject.count({}),
+            await prisma.student.count({
+                where: {
+                    role: "STUDENT"
+                }
+            }),
+            await prisma.roles.count({
+                where: {
+                    role: "TEACHER"
+                }
+            }),
+            await prisma.attendance.count({})
         ])
         return NextResponse.json(new ApiResponse({
             status: 200,
-            data: { batch, branch, subject, batchCount, branchCount, subjectCount },
+            data: { batch, branch, subject, batchCount, branchCount, subjectCount, student, role, attendance },
             message: "Get Subject Branch"
         }))
     }
