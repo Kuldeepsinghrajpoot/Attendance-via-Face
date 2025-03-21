@@ -67,7 +67,6 @@ const getAttendanceSummary = async (date: Date, id: any) => {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Group attendance by subject and batch
     const scheduleAttendance = await prisma.scheduleAttendance.findMany({
         where: {
             teacherId: id,
@@ -75,17 +74,13 @@ const getAttendanceSummary = async (date: Date, id: any) => {
                 gte: startOfDay,
                 lte: endOfDay,
             },
-
         },
-
         include: {
             Subject: true,
             batch: true,
-
             Attendance: {
                 select: {
                     status: true,
-
                     student: {
                         select: {
                             Firstname: true,
@@ -94,41 +89,44 @@ const getAttendanceSummary = async (date: Date, id: any) => {
                             rollNumber: true,
                         },
                     },
-                    // status: true,
-                    subject: true,
+                    subject: {
+                        select: {
+                            subjectName: true,
+                        },
+                    },
                 },
             },
-
         },
     });
 
-    // Group attendance by subject and batch
     const summary: Record<
         string,
         Record<string, { total: number; present: number; absent: number }>
     > = {};
 
     scheduleAttendance.forEach((record) => {
-        const subjectName = record.Attendance[0]?.subject?.subjectName || "Unknown Subject";
-        const batchName = record.Attendance[0]?.student?.batch?.batch || "Unknown Batch";
+        record.Attendance.forEach((att) => {
+            const subjectName = att.subject?.subjectName || "Unknown Subject";
+            const batchName = att.student?.batch?.batch || "Unknown Batch";
 
-        if (!summary[subjectName]) {
-            summary[subjectName] = {};
-        }
-        if (!summary[subjectName][batchName]) {
-            summary[subjectName][batchName] = {
-                total: 0,
-                present: 0,
-                absent: 0,
-            };
-        }
+            if (!summary[subjectName]) {
+                summary[subjectName] = {};
+            }
+            if (!summary[subjectName][batchName]) {
+                summary[subjectName][batchName] = {
+                    total: 0,
+                    present: 0,
+                    absent: 0,
+                };
+            }
 
-        summary[subjectName][batchName].total++;
-        if (record.Attendance.some(att => att.status === "PRESENT")) {
-            summary[subjectName][batchName].present++;
-        } else {
-            summary[subjectName][batchName].absent++;
-        }
+            summary[subjectName][batchName].total++;
+            if (att.status === "PRESENT") {
+                summary[subjectName][batchName].present++;
+            } else {
+                summary[subjectName][batchName].absent++;
+            }
+        });
     });
 
     return summary;
